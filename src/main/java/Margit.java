@@ -25,6 +25,9 @@ public class Margit {
         Scanner scanner = new Scanner(System.in);
         String line = "";
 
+        String[] tasks = new String[100];
+        int taskCount = 0;
+
         while (true) {
             line = scanner.nextLine();
 
@@ -32,7 +35,24 @@ public class Margit {
                 break;
             }
 
-            System.out.println(space + horizontalLine + "\n" + space + line + "\n" );
+            if (line.equals("list")) {
+                StringBuilder listOutput = new StringBuilder();
+                for (int i = 0; i < taskCount; i++) {
+                    listOutput.append(space)
+                               .append(i + 1)
+                               .append(". ")
+                               .append(tasks[i])
+                               .append("\n");
+                }
+                System.out.println(space + horizontalLine + "\n" + listOutput + "\n");
+                System.out.println(space + horizontalLine + "\n");
+                continue;
+            }
+
+            tasks[taskCount] = line;
+            taskCount++;
+
+            System.out.println(space + horizontalLine + "\n" + space + "added: " + line + "\n");
             System.out.println(space + horizontalLine + "\n");
         }
 
