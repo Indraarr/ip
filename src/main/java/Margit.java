@@ -1,5 +1,12 @@
+import java.util.Scanner;
+
 public class Margit {
+    
     public static void main(String[] args) {
+
+        String horizontalLine = "------------------------------------------------------------------------------------------------";
+        String space = "     ";
+
         String banner = "___  ___                _ _         _____ _           ______   _ _   _____                      \n"
                 + "|  \\/  |               (_) |       |_   _| |          |  ___| | | | |  _  |                     \n"
                 + "| .  . | __ _ _ __ __ _ _| |_        | | | |__   ___  | |_ ___| | | | | | |_ __ ___   ___ _ __  \n"
@@ -8,16 +15,33 @@ public class Margit {
                 + "\\_|  |_/\\__,_|_|  \\__, |_|\\__| ( )   \\_/ |_| |_|\\___| \\_| \\___|_|_|  \\___/|_| |_| |_|\\___|_| |_|\n"
                 + "                   __/ |       |/                                                               \n"
                 + "                  |___/                                                                         \n"
-                + "------------------------------------------------------------------------------------------------\n";
+                + horizontalLine + "\n";
         
-        String greet = "Foul tarnished... what is it thou dost seek?\n\n"
-                        + "------------------------------------------------------------------------------------------------\n";
+        String greet = space + "Foul tarnished... what is it thou dost seek?\n\n"
+                        + space + horizontalLine + "\n";
 
         System.out.println(banner + greet);
 
-        String farewell = "Tis well, put these foolish ambitions to rest.\n\n"
-                        + "------------------------------------------------------------------------------------------------\n";
+        Scanner scanner = new Scanner(System.in);
+        String line = "";
+
+        while (true) {
+            line = scanner.nextLine();
+
+            if (line.equals("bye")) {
+                break;
+            }
+
+            System.out.println(space + horizontalLine + "\n" + space + line + "\n" );
+            System.out.println(space + horizontalLine + "\n");
+        }
+
+        String farewell = space + horizontalLine + "\n"
+                        + space + "Tis well... put these foolish ambitions to rest.\n\n"
+                        + space + horizontalLine + "\n";
 
         System.out.println(farewell);
+
+        scanner.close();
     }
 }
