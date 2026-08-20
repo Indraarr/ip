@@ -108,6 +108,7 @@ public class Margit {
             if (line.equals("todo") || line.startsWith("todo ")) {
                 String description = line.length() > 4 ? line.substring(5).trim() : "";
  
+                // missing description
                 if (description.isEmpty()) {
                     System.out.println(space + horizontalLine + "\n" + space
                             + "A todo needs a description, tarnished.\n");
@@ -115,6 +116,7 @@ public class Margit {
                     continue;
                 }
  
+                // exceed list size
                 if (taskCount >= tasks.length) {
                     System.out.println(space + horizontalLine + "\n" + space
                             + "Thy task list can hold no more.\n");
@@ -148,6 +150,8 @@ public class Margit {
                 String description = rest.substring(0, byIndex).trim();
                 String by = rest.substring(byIndex + 3).trim();
  
+
+                // missing description
                 if (description.isEmpty() || by.isEmpty()) {
                     System.out.println(space + horizontalLine + "\n" + space
                             + "A deadline needs both a description and a '/by' date, tarnished.\n");
@@ -155,6 +159,7 @@ public class Margit {
                     continue;
                 }
  
+                // exceed list size
                 if (taskCount >= tasks.length) {
                     System.out.println(space + horizontalLine + "\n" + space
                             + "Thy task list can hold no more.\n");
@@ -178,18 +183,20 @@ public class Margit {
                 String rest = line.length() > 5 ? line.substring(6).trim() : "";
                 int fromIndex = rest.indexOf("/from");
                 int toIndex = rest.indexOf("/to");
- 
+
+                // missing description
                 if (rest.isEmpty() || fromIndex == -1 || toIndex == -1 || toIndex < fromIndex) {
                     System.out.println(space + horizontalLine + "\n" + space
                             + "An event needs a description, a '/from' time, and a '/to' time, tarnished.\n");
                     System.out.println(space + horizontalLine + "\n");
                     continue;
                 }
- 
+
                 String description = rest.substring(0, fromIndex).trim();
                 String from = rest.substring(fromIndex + 5, toIndex).trim();
                 String to = rest.substring(toIndex + 3).trim();
  
+                // missing date
                 if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
                     System.out.println(space + horizontalLine + "\n" + space
                             + "An event needs a description, a '/from' time, and a '/to' time, tarnished.\n");
@@ -197,6 +204,8 @@ public class Margit {
                     continue;
                 }
  
+
+                // exceed list size
                 if (taskCount >= tasks.length) {
                     System.out.println(space + horizontalLine + "\n" + space
                             + "Thy task list can hold no more.\n");
@@ -214,6 +223,15 @@ public class Margit {
                 System.out.println(space + horizontalLine + "\n");
                 continue;
             }
+
+
+            // No task type specified
+
+            System.out.println(space + horizontalLine + "\n" + space
+                    + "No idea what you mean\n");
+            System.out.println(space + horizontalLine + "\n");
+
+
         }
 
 
