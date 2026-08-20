@@ -102,6 +102,46 @@ public class Margit {
                 continue;
             }
 
+            // Delete
+            if (line.startsWith("delete ")) {
+                String indexPart = line.substring(7);
+
+                // Not an integer
+                int index;
+                try {
+                    index = Integer.parseInt(indexPart.trim()) - 1;
+                } catch (NumberFormatException e) {
+                    System.out.println(space + horizontalLine + "\n" + space
+                            + "Hmm, that doesn't look like a valid task number.\n");
+                    System.out.println(space + horizontalLine + "\n");
+                    continue;
+                }
+
+                // No task number
+                if (index < 0 || index >= taskCount) {
+                    System.out.println(space + horizontalLine + "\n" + space
+                            + "That task number doesn't exist, tarnished.\n");
+                    System.out.println(space + horizontalLine + "\n");
+                    continue;
+                }
+
+                Task removed = tasks[index];
+
+                // Shift everything after index down by one
+                for (int i = index; i < taskCount - 1; i++) {
+                    tasks[i] = tasks[i + 1];
+                }
+                tasks[taskCount - 1] = null;
+                taskCount--;
+
+                System.out.println(space + horizontalLine + "\n"
+                        + space + "Noted. I've removed this task:\n"
+                        + space + "  " + removed + "\n"
+                        + space + "Now you have " + taskCount + " tasks in the list.\n");
+                System.out.println(space + horizontalLine + "\n");
+                continue;
+            }
+
 
             // CREATING NEW LIST TASKS
             // Todo
