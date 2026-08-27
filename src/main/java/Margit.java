@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.io.File;
 
 public class Margit {
 
@@ -26,7 +27,7 @@ public class Margit {
         String line = "";
 
         Task[] tasks = new Task[100];
-        int taskCount = 0;
+        int taskCount = loadTasks(tasks);
 
         while (true) {
             line = scanner.nextLine();
@@ -91,6 +92,8 @@ public class Margit {
                     continue;
                 }
 
+                saveTasks(tasks, taskCount);
+
                 String message = listAction
                         ? "Nice! I've marked this task as done:"
                         : "OK, I've marked this task as not done yet:";
@@ -134,6 +137,8 @@ public class Margit {
                 tasks[taskCount - 1] = null;
                 taskCount--;
 
+                saveTasks(tasks, taskCount);
+
                 System.out.println(space + horizontalLine + "\n"
                         + space + "Noted. I've removed this task:\n"
                         + space + "  " + removed + "\n"
@@ -141,7 +146,7 @@ public class Margit {
                 System.out.println(space + horizontalLine + "\n");
                 continue;
             }
-
+            
 
             // CREATING NEW LIST TASKS
             // Todo
@@ -156,7 +161,7 @@ public class Margit {
                     continue;
                 }
  
-                // exceed list size
+                // Exceed list size
                 if (taskCount >= tasks.length) {
                     System.out.println(space + horizontalLine + "\n" + space
                             + "Thy task list can hold no more.\n");
@@ -166,6 +171,8 @@ public class Margit {
  
                 tasks[taskCount] = new TodoTask(description);
                 taskCount++;
+
+                saveTasks(tasks, taskCount);
  
                 System.out.println(space + horizontalLine + "\n"
                         + space + "Got it. I've added this task:\n"
@@ -209,6 +216,8 @@ public class Margit {
  
                 tasks[taskCount] = new DeadlineTask(description, by);
                 taskCount++;
+
+                saveTasks(tasks, taskCount);
  
                 System.out.println(space + horizontalLine + "\n"
                         + space + "Got it. I've added this task:\n"
@@ -255,6 +264,8 @@ public class Margit {
  
                 tasks[taskCount] = new EventTask(description, from, to);
                 taskCount++;
+
+                saveTasks(tasks, taskCount);
  
                 System.out.println(space + horizontalLine + "\n"
                         + space + "Got it. I've added this task:\n"
@@ -317,6 +328,10 @@ public class Margit {
             return isDone ? "[X]" : "[ ]";
         }
 
+        public String toSaveFormat() {
+            return "T | " + (isDone ? "1" : "0") + " | " + description;
+        }
+
         @Override
         public String toString() {
             return getStatusIcon() + " " + description;
@@ -347,6 +362,11 @@ public class Margit {
         }
 
         @Override
+        public String toSaveFormat() {
+            return "D | " + super.toSaveFormat().substring(4) + " | " + by;
+        }
+
+        @Override
         public String toString() {
             return "[D]" + super.toString() + " (by: " + by + ")";
         }
@@ -363,8 +383,98 @@ public class Margit {
         }
 
         @Override
+        public String toSaveFormat() {
+            return "E | " + super.toSaveFormat().substring(4) + " | " + from + " - " + to;
+        }
+
+        @Override
         public String toString() {
             return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
         }
+    }
+
+    /** Relative path (from project root) of the save file. */
+    private static final String SAVE_FILE_PATH = "./data/Margit.txt";
+ 
+    /**
+     * Writes the current task list to disk at {@link #SAVE_FILE_PATH}, overwriting
+     * any previous contents. Creates the parent "data" directory if it does not
+     * already exist. This is the "happy path" implementation: it assumes the
+     * data directory is writable and does not attempt recovery on failure beyond
+     * printing a warning, since reading the file back in is a future feature.
+     */
+
+    private static void saveTasks(Task[] tasks, int taskCount) {
+        java.io.File saveFile = new java.io.File(SAVE_FILE_PATH);
+        java.io.File parentDir = saveFile.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            parentDir.mkdirs();
+        }
+ 
+        try (java.io.FileWriter writer = new java.io.FileWriter(saveFile)) {
+            for (int i = 0; i < taskCount; i++) {
+                writer.write(tasks[i].toSaveFormat() + System.lineSeparator());
+            }
+        } catch (java.io.IOException e) {
+            System.out.println("     Warning: could not save tasks to disk (" + e.getMessage() + ")");
+        }
+    }
+
+    /**
+     * Reads tasks from {@link #SAVE_FILE_PATH} into {@code tasks} and returns
+     * how many were loaded. If the file doesn't exist yet (e.g. first run),
+     * simply returns 0 with an empty list. Any line that doesn't parse cleanly
+     * is skipped with a warning rather than crashing startup.
+     */
+    private static int loadTasks(Task[] tasks) {
+        java.io.File saveFile = new java.io.File(SAVE_FILE_PATH);
+        if (!saveFile.exists()) {
+            return 0;
+        }
+ 
+        int taskCount = 0;
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(saveFile))) {
+            String line;
+            while ((line = reader.readLine()) != null && taskCount < tasks.length) {
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+ 
+                String[] parts = line.split("\\s*\\|\\s*");
+                try {
+                    String type = parts[0];
+                    boolean isDone = parts[1].equals("1");
+                    String description = parts[2];
+ 
+                    Task task;
+                    switch (type) {
+                    case "T":
+                        task = new TodoTask(description);
+                        break;
+                    case "D":
+                        task = new DeadlineTask(description, parts[3]);
+                        break;
+                    case "E":
+                        String[] fromTo = parts[3].split(" - ", 2);
+                        task = new EventTask(description, fromTo[0], fromTo[1]);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown task type: " + type);
+                    }
+ 
+                    if (isDone) {
+                        task.mark();
+                    }
+                    tasks[taskCount] = task;
+                    taskCount++;
+                } catch (RuntimeException e) {
+                    System.out.println("     Warning: skipping corrupted line in save file: " + line);
+                }
+            }
+        } catch (java.io.IOException e) {
+            System.out.println("     Warning: could not load tasks from disk (" + e.getMessage() + ")");
+        }
+ 
+        return taskCount;
     }
 }
