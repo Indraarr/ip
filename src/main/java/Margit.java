@@ -1,5 +1,9 @@
 import java.util.Scanner;
 import java.io.File;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class Margit {
 
@@ -17,7 +21,7 @@ public class Margit {
                 + "                   __/ |       |/                                                               \n"
                 + "                  |___/                                                                         \n"
                 + horizontalLine + "\n";
-        
+
         String greet = space + "Foul tarnished... what is it thou dost seek?\n\n"
                         + space + horizontalLine + "\n";
 
@@ -49,6 +53,43 @@ public class Margit {
                                .append("\n");
                 }
                 System.out.println(space + horizontalLine + "\n" + listOutput + "\n");
+                System.out.println(space + horizontalLine + "\n");
+                continue;
+            }
+
+            // STRETCH GOAL: list tasks occurring on a specific date, e.g. "on 2019-12-02" or "on 2/12/2019"
+            if (line.equals("on") || line.startsWith("on ")) {
+                String datePart = line.length() > 2 ? line.substring(3).trim() : "";
+
+                if (datePart.isEmpty()) {
+                    System.out.println(space + horizontalLine + "\n" + space
+                            + "Tell me which date thou wishest to inspect, tarnished.\n");
+                    System.out.println(space + horizontalLine + "\n");
+                    continue;
+                }
+
+                LocalDate targetDate = TaskDateTime.parseDateOnly(datePart);
+                if (targetDate == null) {
+                    System.out.println(space + horizontalLine + "\n" + space
+                            + "That date makes no sense to me, tarnished.\n");
+                    System.out.println(space + horizontalLine + "\n");
+                    continue;
+                }
+
+                StringBuilder onOutput = new StringBuilder();
+                onOutput.append(space).append("Here is what falls upon ")
+                        .append(targetDate.format(TaskDateTime.OUTPUT_DATE)).append(":\n");
+                int matches = 0;
+                for (int i = 0; i < taskCount; i++) {
+                    if (tasks[i].occursOn(targetDate)) {
+                        matches++;
+                        onOutput.append(space).append(matches).append(".").append(tasks[i]).append("\n");
+                    }
+                }
+                if (matches == 0) {
+                    onOutput.append(space).append("Nothing awaits thee that day.\n");
+                }
+                System.out.println(space + horizontalLine + "\n" + onOutput + "\n");
                 System.out.println(space + horizontalLine + "\n");
                 continue;
             }
@@ -146,13 +187,13 @@ public class Margit {
                 System.out.println(space + horizontalLine + "\n");
                 continue;
             }
-            
+
 
             // CREATING NEW LIST TASKS
             // Todo
             if (line.equals("todo") || line.startsWith("todo ")) {
                 String description = line.length() > 4 ? line.substring(5).trim() : "";
- 
+
                 // missing description
                 if (description.isEmpty()) {
                     System.out.println(space + horizontalLine + "\n" + space
@@ -160,7 +201,7 @@ public class Margit {
                     System.out.println(space + horizontalLine + "\n");
                     continue;
                 }
- 
+
                 // Exceed list size
                 if (taskCount >= tasks.length) {
                     System.out.println(space + horizontalLine + "\n" + space
@@ -168,12 +209,12 @@ public class Margit {
                     System.out.println(space + horizontalLine + "\n");
                     continue;
                 }
- 
+
                 tasks[taskCount] = new TodoTask(description);
                 taskCount++;
 
                 saveTasks(tasks, taskCount);
- 
+
                 System.out.println(space + horizontalLine + "\n"
                         + space + "Got it. I've added this task:\n"
                         + space + "  " + tasks[taskCount - 1].toString() + "\n"
@@ -181,31 +222,31 @@ public class Margit {
                 System.out.println(space + horizontalLine + "\n");
                 continue;
             }
- 
+
             // Deadline
             if (line.equals("deadline") || line.startsWith("deadline ")) {
                 String rest = line.length() > 8 ? line.substring(9).trim() : "";
                 int byIndex = rest.indexOf("/by");
- 
+
                 if (rest.isEmpty() || byIndex == -1) {
                     System.out.println(space + horizontalLine + "\n" + space
                             + "A deadline needs a description and a '/by' date, tarnished.\n");
                     System.out.println(space + horizontalLine + "\n");
                     continue;
                 }
- 
+
                 String description = rest.substring(0, byIndex).trim();
-                String by = rest.substring(byIndex + 3).trim();
- 
+                String byRaw = rest.substring(byIndex + 3).trim();
+
 
                 // missing description
-                if (description.isEmpty() || by.isEmpty()) {
+                if (description.isEmpty() || byRaw.isEmpty()) {
                     System.out.println(space + horizontalLine + "\n" + space
                             + "A deadline needs both a description and a '/by' date, tarnished.\n");
                     System.out.println(space + horizontalLine + "\n");
                     continue;
                 }
- 
+
                 // exceed list size
                 if (taskCount >= tasks.length) {
                     System.out.println(space + horizontalLine + "\n" + space
@@ -213,12 +254,14 @@ public class Margit {
                     System.out.println(space + horizontalLine + "\n");
                     continue;
                 }
- 
+
+                TaskDateTime by = TaskDateTime.parse(byRaw);
+
                 tasks[taskCount] = new DeadlineTask(description, by);
                 taskCount++;
 
                 saveTasks(tasks, taskCount);
- 
+
                 System.out.println(space + horizontalLine + "\n"
                         + space + "Got it. I've added this task:\n"
                         + space + "  " + tasks[taskCount - 1].toString() + "\n"
@@ -226,7 +269,7 @@ public class Margit {
                 System.out.println(space + horizontalLine + "\n");
                 continue;
             }
- 
+
             // Event
             if (line.equals("event") || line.startsWith("event ")) {
                 String rest = line.length() > 5 ? line.substring(6).trim() : "";
@@ -242,17 +285,17 @@ public class Margit {
                 }
 
                 String description = rest.substring(0, fromIndex).trim();
-                String from = rest.substring(fromIndex + 5, toIndex).trim();
-                String to = rest.substring(toIndex + 3).trim();
- 
+                String fromRaw = rest.substring(fromIndex + 5, toIndex).trim();
+                String toRaw = rest.substring(toIndex + 3).trim();
+
                 // missing date
-                if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
+                if (description.isEmpty() || fromRaw.isEmpty() || toRaw.isEmpty()) {
                     System.out.println(space + horizontalLine + "\n" + space
                             + "An event needs a description, a '/from' time, and a '/to' time, tarnished.\n");
                     System.out.println(space + horizontalLine + "\n");
                     continue;
                 }
- 
+
 
                 // exceed list size
                 if (taskCount >= tasks.length) {
@@ -261,12 +304,15 @@ public class Margit {
                     System.out.println(space + horizontalLine + "\n");
                     continue;
                 }
- 
+
+                TaskDateTime from = TaskDateTime.parse(fromRaw);
+                TaskDateTime to = TaskDateTime.parse(toRaw);
+
                 tasks[taskCount] = new EventTask(description, from, to);
                 taskCount++;
 
                 saveTasks(tasks, taskCount);
- 
+
                 System.out.println(space + horizontalLine + "\n"
                         + space + "Got it. I've added this task:\n"
                         + space + "  " + tasks[taskCount - 1].toString() + "\n"
@@ -294,6 +340,107 @@ public class Margit {
         System.out.println(farewell);
 
         scanner.close();
+    }
+
+    
+    private static class TaskDateTime {
+
+        // Formats accepted as *input* from the user or from the save file.
+        private static final DateTimeFormatter[] INPUT_DATETIME_FORMATS = {
+                DateTimeFormatter.ofPattern("d/M/yyyy HHmm"),
+                DateTimeFormatter.ofPattern("d/M/yyyy H:mm"),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"),
+                DateTimeFormatter.ofPattern("MMM d yyyy HHmm"),
+        };
+        private static final DateTimeFormatter[] INPUT_DATE_FORMATS = {
+                DateTimeFormatter.ofPattern("d/M/yyyy"),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd"),
+        };
+
+        // Format used when printing to the user.
+        static final DateTimeFormatter OUTPUT_DATE = DateTimeFormatter.ofPattern("MMM d yyyy");
+        static final DateTimeFormatter OUTPUT_DATETIME = DateTimeFormatter.ofPattern("MMM d yyyy, h:mma");
+
+        // Format used when writing to / reading from the save file (unambiguous, sortable).
+        private static final DateTimeFormatter SAVE_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        private static final DateTimeFormatter SAVE_DATETIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+
+        private final LocalDateTime dateTime; // null if it couldn't be parsed
+        private final boolean hasTime;
+        private final String raw; // original text, used only if dateTime is null
+
+        private TaskDateTime(LocalDateTime dateTime, boolean hasTime, String raw) {
+            this.dateTime = dateTime;
+            this.hasTime = hasTime;
+            this.raw = raw;
+        }
+
+        static TaskDateTime parse(String input) {
+            input = input.trim();
+
+            for (DateTimeFormatter f : INPUT_DATETIME_FORMATS) {
+                try {
+                    return new TaskDateTime(LocalDateTime.parse(input, f), true, null);
+                } catch (DateTimeParseException ignored) {
+                }
+            }
+
+            for (DateTimeFormatter f : INPUT_DATE_FORMATS) {
+                try {
+                    LocalDate d = LocalDate.parse(input, f);
+                    return new TaskDateTime(d.atStartOfDay(), false, null);
+                } catch (DateTimeParseException ignored) {
+                }
+            }
+
+            return new TaskDateTime(null, false, input);
+        }
+
+        static LocalDate parseDateOnly(String input) {
+            input = input.trim();
+            for (DateTimeFormatter f : INPUT_DATE_FORMATS) {
+                try {
+                    return LocalDate.parse(input, f);
+                } catch (DateTimeParseException ignored) {
+                }
+            }
+            TaskDateTime parsed = parse(input);
+            return parsed.dateTime == null ? null : parsed.dateTime.toLocalDate();
+        }
+
+        /** Reconstructs a TaskDateTime from the save file representation. */
+        static TaskDateTime fromSaveFormat(String saved) {
+            if (saved.startsWith("DT:")) {
+                LocalDateTime ldt = LocalDateTime.parse(saved.substring(3), SAVE_DATETIME);
+                return new TaskDateTime(ldt, true, null);
+            } else if (saved.startsWith("D:")) {
+                LocalDate d = LocalDate.parse(saved.substring(2), SAVE_DATE);
+                return new TaskDateTime(d.atStartOfDay(), false, null);
+            } else if (saved.startsWith("RAW:")) {
+                return new TaskDateTime(null, false, saved.substring(4));
+            }
+            return new TaskDateTime(null, false, saved);
+        }
+
+        String toSaveFormat() {
+            if (dateTime == null) {
+                return "RAW:" + raw;
+            }
+            return hasTime ? "DT:" + dateTime.format(SAVE_DATETIME) : "D:" + dateTime.format(SAVE_DATE);
+        }
+
+        LocalDate toLocalDate() {
+            return dateTime == null ? null : dateTime.toLocalDate();
+        }
+
+        @Override
+        public String toString() {
+            if (dateTime == null) {
+                return raw;
+            }
+            return hasTime ? dateTime.format(OUTPUT_DATETIME) : dateTime.format(OUTPUT_DATE);
+        }
     }
 
 
@@ -332,12 +479,17 @@ public class Margit {
             return "T | " + (isDone ? "1" : "0") + " | " + description;
         }
 
+        /** Whether this task falls on the given date. Overridden by date-aware subclasses. */
+        public boolean occursOn(LocalDate date) {
+            return false;
+        }
+
         @Override
         public String toString() {
             return getStatusIcon() + " " + description;
         }
     }
-    
+
 
     // Todo class
     private static class TodoTask extends Task {
@@ -351,19 +503,25 @@ public class Margit {
             return "[T]" + super.toString();
         }
     }
-    
+
     // Deadline class
     private static class DeadlineTask extends Task {
-        private String by;
+        private TaskDateTime by;
 
-        public DeadlineTask(String description, String by) {
+        public DeadlineTask(String description, TaskDateTime by) {
             super(description);
             this.by = by;
         }
 
         @Override
+        public boolean occursOn(LocalDate date) {
+            LocalDate d = by.toLocalDate();
+            return d != null && d.equals(date);
+        }
+
+        @Override
         public String toSaveFormat() {
-            return "D | " + super.toSaveFormat().substring(4) + " | " + by;
+            return "D | " + super.toSaveFormat().substring(4) + " | " + by.toSaveFormat();
         }
 
         @Override
@@ -373,18 +531,28 @@ public class Margit {
     }
 
     private static class EventTask extends Task {
-        private String from;
-        private String to;
+        private TaskDateTime from;
+        private TaskDateTime to;
 
-        public EventTask(String description, String from, String to) {
+        public EventTask(String description, TaskDateTime from, TaskDateTime to) {
             super(description);
             this.from = from;
             this.to = to;
         }
 
         @Override
+        public boolean occursOn(LocalDate date) {
+            LocalDate fromDate = from.toLocalDate();
+            LocalDate toDate = to.toLocalDate();
+            if (fromDate == null || toDate == null) {
+                return false;
+            }
+            return !date.isBefore(fromDate) && !date.isAfter(toDate);
+        }
+
+        @Override
         public String toSaveFormat() {
-            return "E | " + super.toSaveFormat().substring(4) + " | " + from + " - " + to;
+            return "E | " + super.toSaveFormat().substring(4) + " | " + from.toSaveFormat() + " | " + to.toSaveFormat();
         }
 
         @Override
@@ -395,14 +563,6 @@ public class Margit {
 
     /** Relative path (from project root) of the save file. */
     private static final String SAVE_FILE_PATH = "./data/Margit.txt";
- 
-    /**
-     * Writes the current task list to disk at {@link #SAVE_FILE_PATH}, overwriting
-     * any previous contents. Creates the parent "data" directory if it does not
-     * already exist. This is the "happy path" implementation: it assumes the
-     * data directory is writable and does not attempt recovery on failure beyond
-     * printing a warning, since reading the file back in is a future feature.
-     */
 
     private static void saveTasks(Task[] tasks, int taskCount) {
         java.io.File saveFile = new java.io.File(SAVE_FILE_PATH);
@@ -410,7 +570,7 @@ public class Margit {
         if (parentDir != null && !parentDir.exists()) {
             parentDir.mkdirs();
         }
- 
+
         try (java.io.FileWriter writer = new java.io.FileWriter(saveFile)) {
             for (int i = 0; i < taskCount; i++) {
                 writer.write(tasks[i].toSaveFormat() + System.lineSeparator());
@@ -431,7 +591,7 @@ public class Margit {
         if (!saveFile.exists()) {
             return 0;
         }
- 
+
         int taskCount = 0;
         try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(saveFile))) {
             String line;
@@ -439,29 +599,30 @@ public class Margit {
                 if (line.trim().isEmpty()) {
                     continue;
                 }
- 
+
                 String[] parts = line.split("\\s*\\|\\s*");
                 try {
                     String type = parts[0];
                     boolean isDone = parts[1].equals("1");
                     String description = parts[2];
- 
+
                     Task task;
                     switch (type) {
                     case "T":
                         task = new TodoTask(description);
                         break;
                     case "D":
-                        task = new DeadlineTask(description, parts[3]);
+                        task = new DeadlineTask(description, TaskDateTime.fromSaveFormat(parts[3]));
                         break;
                     case "E":
-                        String[] fromTo = parts[3].split(" - ", 2);
-                        task = new EventTask(description, fromTo[0], fromTo[1]);
+                        task = new EventTask(description,
+                                TaskDateTime.fromSaveFormat(parts[3]),
+                                TaskDateTime.fromSaveFormat(parts[4]));
                         break;
                     default:
                         throw new IllegalArgumentException("Unknown task type: " + type);
                     }
- 
+
                     if (isDone) {
                         task.mark();
                     }
@@ -474,7 +635,7 @@ public class Margit {
         } catch (java.io.IOException e) {
             System.out.println("     Warning: could not load tasks from disk (" + e.getMessage() + ")");
         }
- 
+
         return taskCount;
     }
 }
