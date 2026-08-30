@@ -43,18 +43,16 @@ public class Margit {
                         + space + horizontalLine + "\n";
 
         ui.showWelcome(banner + greet);
-        String line = "";
-
         while (true) {
-            line = ui.readCommand();
+            Parser.Command command = Parser.parse(ui.readCommand());
 
             // End Conversation
-            if (line.equals("bye")) {
+            if (command.type == Parser.CommandType.BYE) {
                 break;
             }
 
             // List
-            if (line.equals("list")) {
+            if (command.type == Parser.CommandType.LIST) {
                 StringBuilder listOutput = new StringBuilder();
                 listOutput.append(space).append("Here are the tasks in your list:\n");
                 for (int i = 0; i < tasks.size(); i++) {
@@ -69,8 +67,8 @@ public class Margit {
             }
 
             // STRETCH GOAL: list tasks occurring on a specific date, e.g. "on 2019-12-02" or "on 2/12/2019"
-            if (line.equals("on") || line.startsWith("on ")) {
-                String datePart = line.length() > 2 ? line.substring(3).trim() : "";
+            if (command.type == Parser.CommandType.ON) {
+                String datePart = command.argument;
 
                 if (datePart.isEmpty()) {
                     ui.showFramed(space + "Tell me which date thou wishest to inspect, tarnished.\n",
@@ -102,9 +100,9 @@ public class Margit {
             }
 
             // LIST TASKS
-            if (line.startsWith("mark ") || line.startsWith("unmark ")) {
-                boolean listAction = line.startsWith("mark ");
-                String indexPart = listAction ? line.substring(5) : line.substring(7);
+            if (command.type == Parser.CommandType.MARK || command.type == Parser.CommandType.UNMARK) {
+                boolean listAction = command.type == Parser.CommandType.MARK;
+                String indexPart = command.argument;
 
                 // Not an integer
                 int index;
@@ -145,8 +143,8 @@ public class Margit {
             }
 
             // Delete
-            if (line.startsWith("delete ")) {
-                String indexPart = line.substring(7);
+            if (command.type == Parser.CommandType.DELETE) {
+                String indexPart = command.argument;
 
                 // Not an integer
                 int index;
@@ -176,8 +174,8 @@ public class Margit {
 
             // CREATING NEW LIST TASKS
             // Todo
-            if (line.equals("todo") || line.startsWith("todo ")) {
-                String description = line.length() > 4 ? line.substring(5).trim() : "";
+            if (command.type == Parser.CommandType.TODO) {
+                String description = command.argument;
 
                 // missing description
                 if (description.isEmpty()) {
@@ -202,8 +200,8 @@ public class Margit {
             }
 
             // Deadline
-            if (line.equals("deadline") || line.startsWith("deadline ")) {
-                String rest = line.length() > 8 ? line.substring(9).trim() : "";
+            if (command.type == Parser.CommandType.DEADLINE) {
+                String rest = command.argument;
                 int byIndex = rest.indexOf("/by");
 
                 if (rest.isEmpty() || byIndex == -1) {
@@ -242,8 +240,8 @@ public class Margit {
             }
 
             // Event
-            if (line.equals("event") || line.startsWith("event ")) {
-                String rest = line.length() > 5 ? line.substring(6).trim() : "";
+            if (command.type == Parser.CommandType.EVENT) {
+                String rest = command.argument;
                 int fromIndex = rest.indexOf("/from");
                 int toIndex = rest.indexOf("/to");
 
@@ -695,4 +693,67 @@ class Ui {
     }
 
     private static final String INDENT = "     ";
+}
+
+/** Interprets a raw user command as a command type and its argument. */
+class Parser {
+    /** Recognized commands accepted by the application. */
+    enum CommandType {
+        BYE, LIST, ON, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, UNKNOWN
+    }
+
+    /** Parsed result containing the command type and its remaining argument. */
+    static class Command {
+        final CommandType type;
+        final String argument;
+
+        /** Creates a parsed command. */
+        Command(CommandType type, String argument) {
+            this.type = type;
+            this.argument = argument;
+        }
+    }
+
+    /**
+     * Parses an input line without validating command-specific arguments.
+     *
+     * @param input raw command entered by the user
+     * @return the identified command and its argument, or {@code UNKNOWN}
+     */
+    static Command parse(String input) {
+        if (input.equals("bye")) {
+            return new Command(CommandType.BYE, "");
+        }
+        if (input.equals("list")) {
+            return new Command(CommandType.LIST, "");
+        }
+        if (input.equals("on") || input.startsWith("on ")) {
+            return commandWithTrimmedArgument(CommandType.ON, input, 2);
+        }
+        if (input.startsWith("mark ")) {
+            return new Command(CommandType.MARK, input.substring(5));
+        }
+        if (input.startsWith("unmark ")) {
+            return new Command(CommandType.UNMARK, input.substring(7));
+        }
+        if (input.startsWith("delete ")) {
+            return new Command(CommandType.DELETE, input.substring(7));
+        }
+        if (input.equals("todo") || input.startsWith("todo ")) {
+            return commandWithTrimmedArgument(CommandType.TODO, input, 4);
+        }
+        if (input.equals("deadline") || input.startsWith("deadline ")) {
+            return commandWithTrimmedArgument(CommandType.DEADLINE, input, 8);
+        }
+        if (input.equals("event") || input.startsWith("event ")) {
+            return commandWithTrimmedArgument(CommandType.EVENT, input, 5);
+        }
+        return new Command(CommandType.UNKNOWN, "");
+    }
+
+    /** Extracts and trims the text following a keyword and one separating space. */
+    private static Command commandWithTrimmedArgument(CommandType type, String input, int keywordLength) {
+        String argument = input.length() > keywordLength ? input.substring(keywordLength + 1).trim() : "";
+        return new Command(type, argument);
+    }
 }
