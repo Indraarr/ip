@@ -4,7 +4,7 @@ package margit.parser;
 public class Parser {
     /** Recognized commands accepted by the application. */
     public enum CommandType {
-        BYE, LIST, ON, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, UNKNOWN
+        BYE, LIST, FIND, ON, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, UNKNOWN
     }
 
     /** Parsed result containing the command type and its remaining argument. */
@@ -76,6 +76,9 @@ public class Parser {
         }
         if (input.equals("list")) {
             return new Command(CommandType.LIST, "");
+        }
+        if (input.equals("find") || input.startsWith("find ")) {
+            return commandWithTrimmedArgument(CommandType.FIND, input, 4);
         }
         if (input.equals("on") || input.startsWith("on ")) {
             return commandWithTrimmedArgument(CommandType.ON, input, 2);

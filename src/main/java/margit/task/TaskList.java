@@ -37,4 +37,15 @@ public class TaskList {
         size--;
         return removed;
     }
+
+    /** Returns the tasks whose descriptions contain {@code keyword}, in list order. */
+    public TaskList findByKeyword(String keyword) {
+        TaskList matchingTasks = new TaskList();
+        for (int i = 0; i < size; i++) {
+            if (tasks[i].hasKeyword(keyword)) {
+                matchingTasks.add(tasks[i]);
+            }
+        }
+        return matchingTasks;
+    }
 }

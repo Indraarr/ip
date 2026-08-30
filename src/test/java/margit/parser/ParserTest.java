@@ -25,6 +25,22 @@ class ParserTest {
     }
 
     @Test
+    void parse_findCommand_trimsKeywordArgument() {
+        Parser.Command command = Parser.parse("find   book  ");
+
+        assertEquals(Parser.CommandType.FIND, command.type);
+        assertEquals("book", command.argument);
+    }
+
+    @Test
+    void parse_findWithoutKeyword_returnsFindCommandWithEmptyArgument() {
+        Parser.Command command = Parser.parse("find");
+
+        assertEquals(Parser.CommandType.FIND, command.type);
+        assertEquals("", command.argument);
+    }
+
+    @Test
     void parse_indexedCommands_validAndInvalidIndices() {
         Parser.Command markedTask = Parser.parse("mark  2");
         Parser.Command unmarkedTask = Parser.parse("unmark 1");
