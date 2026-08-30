@@ -1,4 +1,3 @@
-import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,7 +28,8 @@ public class Margit {
         String line = "";
 
         TaskList tasks = new TaskList();
-        loadTasks(tasks);
+        Storage storage = new Storage("./data/Margit.txt");
+        storage.load(tasks);
 
         while (true) {
             line = ui.readCommand();
@@ -120,7 +120,7 @@ public class Margit {
                     continue;
                 }
 
-                saveTasks(tasks);
+                storage.save(tasks);
 
                 String message = listAction
                         ? "Nice! I've marked this task as done:"
@@ -151,7 +151,7 @@ public class Margit {
 
                 Task removed = tasks.remove(index);
 
-                saveTasks(tasks);
+                storage.save(tasks);
 
                 ui.showFramed(space + "Noted. I've removed this task:\n"
                         + space + "  " + removed + "\n"
@@ -179,7 +179,7 @@ public class Margit {
 
                 tasks.add(new TodoTask(description));
 
-                saveTasks(tasks);
+                storage.save(tasks);
 
                 ui.showFramed(space + "Got it. I've added this task:\n"
                         + space + "  " + tasks.get(tasks.size() - 1) + "\n"
@@ -219,7 +219,7 @@ public class Margit {
 
                 tasks.add(new DeadlineTask(description, by));
 
-                saveTasks(tasks);
+                storage.save(tasks);
 
                 ui.showFramed(space + "Got it. I've added this task:\n"
                         + space + "  " + tasks.get(tasks.size() - 1) + "\n"
@@ -263,7 +263,7 @@ public class Margit {
 
                 tasks.add(new EventTask(description, from, to));
 
-                saveTasks(tasks);
+                storage.save(tasks);
 
                 ui.showFramed(space + "Got it. I've added this task:\n"
                         + space + "  " + tasks.get(tasks.size() - 1) + "\n"
@@ -509,76 +509,84 @@ public class Margit {
         }
     }
 
-    /** Relative path (from project root) of the save file. */
-    private static final String SAVE_FILE_PATH = "./data/Margit.txt";
+    /** Loads tasks from and saves tasks to the application's data file. */
+    private static class Storage {
+        private final String filePath;
 
-    private static void saveTasks(TaskList tasks) {
-        java.io.File saveFile = new java.io.File(SAVE_FILE_PATH);
-        java.io.File parentDir = saveFile.getParentFile();
-        if (parentDir != null && !parentDir.exists()) {
-            parentDir.mkdirs();
+        /** Creates storage that reads from and writes to {@code filePath}. */
+        Storage(String filePath) {
+            this.filePath = filePath;
         }
 
-        try (java.io.FileWriter writer = new java.io.FileWriter(saveFile)) {
-            for (int i = 0; i < tasks.size(); i++) {
-                writer.write(tasks.get(i).toSaveFormat() + System.lineSeparator());
+        /** Saves the tasks in their current order. */
+        void save(TaskList tasks) {
+            java.io.File saveFile = new java.io.File(filePath);
+            java.io.File parentDir = saveFile.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
             }
-        } catch (java.io.IOException e) {
-            System.out.println("     Warning: could not save tasks to disk (" + e.getMessage() + ")");
-        }
-    }
 
-    /**
-     * Reads tasks from {@link #SAVE_FILE_PATH} into {@code tasks}. If the file
-     * doesn't exist yet (e.g. first run), the list remains empty. Any line that
-     * doesn't parse cleanly is skipped with a warning rather than crashing startup.
-     */
-    private static void loadTasks(TaskList tasks) {
-        java.io.File saveFile = new java.io.File(SAVE_FILE_PATH);
-        if (!saveFile.exists()) {
-            return;
-        }
-
-        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(saveFile))) {
-            String line;
-            while ((line = reader.readLine()) != null && !tasks.isFull()) {
-                if (line.trim().isEmpty()) {
-                    continue;
+            try (java.io.FileWriter writer = new java.io.FileWriter(saveFile)) {
+                for (int i = 0; i < tasks.size(); i++) {
+                    writer.write(tasks.get(i).toSaveFormat() + System.lineSeparator());
                 }
+            } catch (java.io.IOException e) {
+                System.out.println("     Warning: could not save tasks to disk (" + e.getMessage() + ")");
+            }
+        }
 
-                String[] parts = line.split("\\s*\\|\\s*");
-                try {
-                    String type = parts[0];
-                    boolean isDone = parts[1].equals("1");
-                    String description = parts[2];
+        /**
+         * Reads tasks from the configured file into {@code tasks}. If the file
+         * doesn't exist yet (e.g. first run), the list remains empty. Any line that
+         * doesn't parse cleanly is skipped with a warning rather than crashing startup.
+         */
+        void load(TaskList tasks) {
+            java.io.File saveFile = new java.io.File(filePath);
+            if (!saveFile.exists()) {
+                return;
+            }
 
-                    Task task;
-                    switch (type) {
-                    case "T":
-                        task = new TodoTask(description);
-                        break;
-                    case "D":
-                        task = new DeadlineTask(description, TaskDateTime.fromSaveFormat(parts[3]));
-                        break;
-                    case "E":
-                        task = new EventTask(description,
-                                TaskDateTime.fromSaveFormat(parts[3]),
-                                TaskDateTime.fromSaveFormat(parts[4]));
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Unknown task type: " + type);
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(saveFile))) {
+                String line;
+                while ((line = reader.readLine()) != null && !tasks.isFull()) {
+                    if (line.trim().isEmpty()) {
+                        continue;
                     }
 
-                    if (isDone) {
-                        task.mark();
+                    String[] parts = line.split("\\s*\\|\\s*");
+                    try {
+                        String type = parts[0];
+                        boolean isDone = parts[1].equals("1");
+                        String description = parts[2];
+
+                        Task task;
+                        switch (type) {
+                        case "T":
+                            task = new TodoTask(description);
+                            break;
+                        case "D":
+                            task = new DeadlineTask(description, TaskDateTime.fromSaveFormat(parts[3]));
+                            break;
+                        case "E":
+                            task = new EventTask(description,
+                                    TaskDateTime.fromSaveFormat(parts[3]),
+                                    TaskDateTime.fromSaveFormat(parts[4]));
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Unknown task type: " + type);
+                        }
+
+                        if (isDone) {
+                            task.mark();
+                        }
+                        tasks.add(task);
+                    } catch (RuntimeException e) {
+                        System.out.println("     Warning: skipping corrupted line in save file: " + line);
                     }
-                    tasks.add(task);
-                } catch (RuntimeException e) {
-                    System.out.println("     Warning: skipping corrupted line in save file: " + line);
                 }
+            } catch (java.io.IOException e) {
+                System.out.println("     Warning: could not load tasks from disk (" + e.getMessage() + ")");
             }
-        } catch (java.io.IOException e) {
-            System.out.println("     Warning: could not load tasks from disk (" + e.getMessage() + ")");
         }
     }
 
