@@ -35,15 +35,21 @@ public class Margit {
 
     /** Runs the interactive command loop until the user enters {@code bye}. */
     public void run() {
-        String horizontalLine = "------------------------------------------------------------------------------------------------";
+        String horizontalLine = "-".repeat(96);
         String space = "     ";
 
-        String banner = "___  ___                _ _         _____ _           ______   _ _   _____                      \n"
-                + "|  \\/  |               (_) |       |_   _| |          |  ___| | | | |  _  |                     \n"
-                + "| .  . | __ _ _ __ __ _ _| |_        | | | |__   ___  | |_ ___| | | | | | |_ __ ___   ___ _ __  \n"
-                + "| |\\/| |/ _` | '__/ _` | | __|       | | | '_ \\ / _ \\ |  _/ _ \\ | | | | | | | '_ ` _ \\ / _ \\ '_ \\ \n"
-                + "| |  | | (_| | | | (_| | | |_   _    | | | | | | |  __/ | ||  __/ | | \\ \\_/ / | | | | | | |  __/ | | |\n"
-                + "\\_|  |_/\\__,_|_|  \\__, |_|\\__| ( )   \\_/ |_| |_|\\___| \\_| \\___|_|_|  \\___/|_| |_| |_| |_|\\___|_| |_|\n"
+        String banner = "___  ___                _ _         _____ _           "
+                + "______   _ _   _____                      \n"
+                + "|  \\/  |               (_) |       |_   _| |          "
+                + "|  ___| | | | |  _  |                     \n"
+                + "| .  . | __ _ _ __ __ _ _| |_        | | | |__   ___  "
+                + "| |_ ___| | | | | | |_ __ ___   ___ _ __  \n"
+                + "| |\\/| |/ _` | '__/ _` | | __|       | | | '_ \\ / _ \\ "
+                + "|  _/ _ \\ | | | | | | | '_ ` _ \\ / _ \\ '_ \\ \n"
+                + "| |  | | (_| | | | (_| | | |_   _    | | | | | | |  __/ "
+                + "| ||  __/ | | \\ \\_/ / | | | | | | |  __/ | | |\n"
+                + "\\_|  |_/\\__,_|_|  \\__, |_|\\__| ( )   \\_/ |_| |_|\\___| "
+                + "\\_| \\___|_|_|  \\___/|_| |_| |_| |_|\\___|_| |_|\n"
                 + "                   __/ |       |/                                                               \n"
                 + "                  |___/                                                                         \n"
                 + horizontalLine + "\n";
@@ -189,7 +195,8 @@ public class Margit {
             if (command.type == Parser.CommandType.EVENT) {
                 Parser.EventArguments event = Parser.parseEvent(command.argument);
                 if (!event.isValid) {
-                    ui.showFramed(space + "An event needs a description, a '/from' time, and a '/to' time, tarnished.\n",
+                    ui.showFramed(
+                            space + "An event needs a description, a '/from' time, and a '/to' time, tarnished.\n",
                             horizontalLine);
                     continue;
                 }
