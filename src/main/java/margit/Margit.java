@@ -75,6 +75,25 @@ public class Margit {
                 continue;
             }
 
+            if (command.type == Parser.CommandType.FIND) {
+                if (command.argument.isEmpty()) {
+                    ui.showFramed(space + "A find command needs a keyword, tarnished.\n", horizontalLine);
+                    continue;
+                }
+
+                TaskList matchingTasks = tasks.findByKeyword(command.argument);
+                StringBuilder findOutput = new StringBuilder();
+                findOutput.append(space).append("Here are the matching tasks in your list:\n");
+                for (int i = 0; i < matchingTasks.size(); i++) {
+                    findOutput.append(space).append(i + 1).append(".").append(matchingTasks.get(i)).append("\n");
+                }
+                if (matchingTasks.size() == 0) {
+                    findOutput.append(space).append("No matching tasks found.\n");
+                }
+                ui.showFramed(findOutput.toString(), horizontalLine);
+                continue;
+            }
+
             if (command.type == Parser.CommandType.ON) {
                 String datePart = command.argument;
                 if (datePart.isEmpty()) {

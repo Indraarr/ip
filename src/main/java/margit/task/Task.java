@@ -40,6 +40,11 @@ public class Task {
         return "T | " + (isDone ? "1" : "0") + " | " + description;
     }
 
+    /** Returns whether this task's description contains {@code keyword}. */
+    public boolean hasKeyword(String keyword) {
+        return description.contains(keyword);
+    }
+
     /** Returns whether this task falls on {@code date}. */
     public boolean occursOn(LocalDate date) {
         return false;
