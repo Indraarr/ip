@@ -3,11 +3,29 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+/** A command-line task manager that coordinates user interaction, tasks, and storage. */
 public class Margit {
+    /** Handles all console interaction. */
+    private final Ui ui;
+    /** Holds the application's current tasks. */
+    private final TaskList tasks;
+    /** Persists tasks between application runs. */
+    private final Storage storage;
 
-    public static void main(String[] args) {
+    /**
+     * Creates the application and loads any existing tasks from {@code filePath}.
+     *
+     * @param filePath location of the task save file
+     */
+    public Margit(String filePath) {
+        ui = new Ui();
+        tasks = new TaskList();
+        storage = new Storage(filePath);
+        storage.load(tasks);
+    }
 
-        Ui ui = new Ui();
+    /** Runs the interactive command loop until the user enters {@code bye}. */
+    public void run() {
         String horizontalLine = "------------------------------------------------------------------------------------------------";
         String space = "     ";
 
@@ -26,10 +44,6 @@ public class Margit {
 
         ui.showWelcome(banner + greet);
         String line = "";
-
-        TaskList tasks = new TaskList();
-        Storage storage = new Storage("./data/Margit.txt");
-        storage.load(tasks);
 
         while (true) {
             line = ui.readCommand();
@@ -288,6 +302,11 @@ public class Margit {
         ui.showFarewell(farewell);
 
         ui.close();
+    }
+
+    /** Starts the application using its default save-file location. */
+    public static void main(String[] args) {
+        new Margit("./data/Margit.txt").run();
     }
 
     
