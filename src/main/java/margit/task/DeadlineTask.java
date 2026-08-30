@@ -1,0 +1,30 @@
+package margit.task;
+
+import java.time.LocalDate;
+
+/** Represents a task with a deadline. */
+public class DeadlineTask extends Task {
+    private final TaskDateTime by;
+
+    /** Creates a deadline task with its description and deadline. */
+    public DeadlineTask(String description, TaskDateTime by) {
+        super(description);
+        this.by = by;
+    }
+
+    @Override
+    public boolean occursOn(LocalDate date) {
+        LocalDate deadlineDate = by.toLocalDate();
+        return deadlineDate != null && deadlineDate.equals(date);
+    }
+
+    @Override
+    public String toSaveFormat() {
+        return "D | " + super.toSaveFormat().substring(4) + " | " + by.toSaveFormat();
+    }
+
+    @Override
+    public String toString() {
+        return "[D]" + super.toString() + " (by: " + by + ")";
+    }
+}
