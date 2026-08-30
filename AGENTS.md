@@ -26,7 +26,7 @@ Unless the user says otherwise, assume that you are assisting a student working 
 
 ## Java version:
 
-Ensure that Java 25 is used when running the application or build tasks. On macOS, use `sdk use java 25.0.3.fx-zulu` to switch to Java 25 if needed.
+Ensure that Java 17 is used when running the application or build tasks, as required by CS2103/T. On macOS, use the course-prescribed Java 17 distribution.
 
 ## Testing
 
