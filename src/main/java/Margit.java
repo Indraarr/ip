@@ -102,16 +102,12 @@ public class Margit {
             // LIST TASKS
             if (command.type == Parser.CommandType.MARK || command.type == Parser.CommandType.UNMARK) {
                 boolean listAction = command.type == Parser.CommandType.MARK;
-                String indexPart = command.argument;
 
-                // Not an integer
-                int index;
-                try {
-                    index = Integer.parseInt(indexPart.trim()) - 1;
-                } catch (NumberFormatException e) {
+                if (command.taskIndex == null) {
                     ui.showFramed(space + "Hmm, that doesn't look like a valid task number.\n", horizontalLine);
                     continue;
                 }
+                int index = command.taskIndex;
 
                 // No task number
                 if (index < 0 || index >= tasks.size()) {
@@ -144,16 +140,11 @@ public class Margit {
 
             // Delete
             if (command.type == Parser.CommandType.DELETE) {
-                String indexPart = command.argument;
-
-                // Not an integer
-                int index;
-                try {
-                    index = Integer.parseInt(indexPart.trim()) - 1;
-                } catch (NumberFormatException e) {
+                if (command.taskIndex == null) {
                     ui.showFramed(space + "Hmm, that doesn't look like a valid task number.\n", horizontalLine);
                     continue;
                 }
+                int index = command.taskIndex;
 
                 // No task number
                 if (index < 0 || index >= tasks.size()) {
@@ -706,11 +697,19 @@ class Parser {
     static class Command {
         final CommandType type;
         final String argument;
+        /** Zero-based task index for indexed commands, or {@code null} when it is invalid or irrelevant. */
+        final Integer taskIndex;
 
         /** Creates a parsed command. */
         Command(CommandType type, String argument) {
+            this(type, argument, null);
+        }
+
+        /** Creates a parsed command with an optional zero-based task index. */
+        Command(CommandType type, String argument, Integer taskIndex) {
             this.type = type;
             this.argument = argument;
+            this.taskIndex = taskIndex;
         }
     }
 
@@ -731,13 +730,13 @@ class Parser {
             return commandWithTrimmedArgument(CommandType.ON, input, 2);
         }
         if (input.startsWith("mark ")) {
-            return new Command(CommandType.MARK, input.substring(5));
+            return indexCommand(CommandType.MARK, input.substring(5));
         }
         if (input.startsWith("unmark ")) {
-            return new Command(CommandType.UNMARK, input.substring(7));
+            return indexCommand(CommandType.UNMARK, input.substring(7));
         }
         if (input.startsWith("delete ")) {
-            return new Command(CommandType.DELETE, input.substring(7));
+            return indexCommand(CommandType.DELETE, input.substring(7));
         }
         if (input.equals("todo") || input.startsWith("todo ")) {
             return commandWithTrimmedArgument(CommandType.TODO, input, 4);
@@ -755,5 +754,14 @@ class Parser {
     private static Command commandWithTrimmedArgument(CommandType type, String input, int keywordLength) {
         String argument = input.length() > keywordLength ? input.substring(keywordLength + 1).trim() : "";
         return new Command(type, argument);
+    }
+
+    /** Parses the one-based task number supplied to an indexed command. */
+    private static Command indexCommand(CommandType type, String argument) {
+        try {
+            return new Command(type, argument, Integer.parseInt(argument.trim()) - 1);
+        } catch (NumberFormatException e) {
+            return new Command(type, argument, null);
+        }
     }
 }
