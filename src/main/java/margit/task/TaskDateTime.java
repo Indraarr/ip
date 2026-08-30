@@ -95,6 +95,7 @@ public class TaskDateTime {
         return dateTime == null ? null : dateTime.toLocalDate();
     }
 
+    /** Returns this value in the user-facing date or date-time format. */
     @Override
     public String toString() {
         if (dateTime == null) {

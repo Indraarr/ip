@@ -45,6 +45,7 @@ public class Task {
         return false;
     }
 
+    /** Returns the user-facing status and description of this task. */
     @Override
     public String toString() {
         return getStatusIcon() + " " + description;

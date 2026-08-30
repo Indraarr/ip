@@ -7,6 +7,7 @@ public class TodoTask extends Task {
         super(description);
     }
 
+    /** Returns the user-facing representation with the todo type marker. */
     @Override
     public String toString() {
         return "[T]" + super.toString();
