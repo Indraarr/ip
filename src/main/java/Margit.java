@@ -192,21 +192,15 @@ public class Margit {
 
             // Deadline
             if (command.type == Parser.CommandType.DEADLINE) {
-                String rest = command.argument;
-                int byIndex = rest.indexOf("/by");
+                Parser.DeadlineArguments deadline = Parser.parseDeadline(command.argument);
 
-                if (rest.isEmpty() || byIndex == -1) {
+                if (deadline.status == Parser.DeadlineStatus.MISSING_SEPARATOR) {
                     ui.showFramed(space + "A deadline needs a description and a '/by' date, tarnished.\n",
                             horizontalLine);
                     continue;
                 }
 
-                String description = rest.substring(0, byIndex).trim();
-                String byRaw = rest.substring(byIndex + 3).trim();
-
-
-                // missing description
-                if (description.isEmpty() || byRaw.isEmpty()) {
+                if (deadline.status == Parser.DeadlineStatus.MISSING_COMPONENT) {
                     ui.showFramed(space + "A deadline needs both a description and a '/by' date, tarnished.\n",
                             horizontalLine);
                     continue;
@@ -218,9 +212,9 @@ public class Margit {
                     continue;
                 }
 
-                TaskDateTime by = TaskDateTime.parse(byRaw);
+                TaskDateTime by = TaskDateTime.parse(deadline.byRaw);
 
-                tasks.add(new DeadlineTask(description, by));
+                tasks.add(new DeadlineTask(deadline.description, by));
 
                 storage.save(tasks);
 
@@ -713,6 +707,25 @@ class Parser {
         }
     }
 
+    /** Validation outcomes for a deadline command's required components. */
+    enum DeadlineStatus {
+        VALID, MISSING_SEPARATOR, MISSING_COMPONENT
+    }
+
+    /** Parsed description and date text from a deadline command. */
+    static class DeadlineArguments {
+        final DeadlineStatus status;
+        final String description;
+        final String byRaw;
+
+        /** Creates parsed deadline arguments. */
+        DeadlineArguments(DeadlineStatus status, String description, String byRaw) {
+            this.status = status;
+            this.description = description;
+            this.byRaw = byRaw;
+        }
+    }
+
     /**
      * Parses an input line without validating command-specific arguments.
      *
@@ -748,6 +761,21 @@ class Parser {
             return commandWithTrimmedArgument(CommandType.EVENT, input, 5);
         }
         return new Command(CommandType.UNKNOWN, "");
+    }
+
+    /** Parses the description and required {@code /by} value of a deadline command. */
+    static DeadlineArguments parseDeadline(String argument) {
+        int byIndex = argument.indexOf("/by");
+        if (argument.isEmpty() || byIndex == -1) {
+            return new DeadlineArguments(DeadlineStatus.MISSING_SEPARATOR, "", "");
+        }
+
+        String description = argument.substring(0, byIndex).trim();
+        String byRaw = argument.substring(byIndex + 3).trim();
+        if (description.isEmpty() || byRaw.isEmpty()) {
+            return new DeadlineArguments(DeadlineStatus.MISSING_COMPONENT, description, byRaw);
+        }
+        return new DeadlineArguments(DeadlineStatus.VALID, description, byRaw);
     }
 
     /** Extracts and trims the text following a keyword and one separating space. */
