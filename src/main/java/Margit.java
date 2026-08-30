@@ -28,8 +28,8 @@ public class Margit {
         ui.showWelcome(banner + greet);
         String line = "";
 
-        Task[] tasks = new Task[100];
-        int taskCount = loadTasks(tasks);
+        TaskList tasks = new TaskList();
+        loadTasks(tasks);
 
         while (true) {
             line = ui.readCommand();
@@ -43,11 +43,11 @@ public class Margit {
             if (line.equals("list")) {
                 StringBuilder listOutput = new StringBuilder();
                 listOutput.append(space).append("Here are the tasks in your list:\n");
-                for (int i = 0; i < taskCount; i++) {
+                for (int i = 0; i < tasks.size(); i++) {
                     listOutput.append(space)
                                .append(i + 1)
                                .append(".")
-                               .append(tasks[i])
+                               .append(tasks.get(i))
                                .append("\n");
                 }
                 ui.showFramed(listOutput.toString(), horizontalLine);
@@ -74,10 +74,10 @@ public class Margit {
                 onOutput.append(space).append("Here is what falls upon ")
                         .append(targetDate.format(TaskDateTime.OUTPUT_DATE)).append(":\n");
                 int matches = 0;
-                for (int i = 0; i < taskCount; i++) {
-                    if (tasks[i].occursOn(targetDate)) {
+                for (int i = 0; i < tasks.size(); i++) {
+                    if (tasks.get(i).occursOn(targetDate)) {
                         matches++;
-                        onOutput.append(space).append(matches).append(".").append(tasks[i]).append("\n");
+                        onOutput.append(space).append(matches).append(".").append(tasks.get(i)).append("\n");
                     }
                 }
                 if (matches == 0) {
@@ -102,31 +102,31 @@ public class Margit {
                 }
 
                 // No task number
-                if (index < 0 || index >= taskCount) {
+                if (index < 0 || index >= tasks.size()) {
                     ui.showFramed(space + "That task number doesn't exist, tarnished.\n", horizontalLine);
                     continue;
                 }
 
 
                 // Mark / Unmark logic
-                boolean success = listAction ? tasks[index].mark() : tasks[index].unmark();
+                boolean success = listAction ? tasks.get(index).mark() : tasks.get(index).unmark();
 
                 if (!success) {
                     String alreadyMessage = listAction
                             ? "This task is already marked as done, tarnished:"
                             : "This task is already marked as not done, tarnished:";
-                    ui.showFramed(space + alreadyMessage + "\n" + space + "  " + tasks[index] + "\n",
+                    ui.showFramed(space + alreadyMessage + "\n" + space + "  " + tasks.get(index) + "\n",
                             horizontalLine);
                     continue;
                 }
 
-                saveTasks(tasks, taskCount);
+                saveTasks(tasks);
 
                 String message = listAction
                         ? "Nice! I've marked this task as done:"
                         : "OK, I've marked this task as not done yet:";
 
-                ui.showFramed(space + message + "\n" + space + "  " + tasks[index] + "\n", horizontalLine);
+                ui.showFramed(space + message + "\n" + space + "  " + tasks.get(index) + "\n", horizontalLine);
                 continue;
             }
 
@@ -144,25 +144,18 @@ public class Margit {
                 }
 
                 // No task number
-                if (index < 0 || index >= taskCount) {
+                if (index < 0 || index >= tasks.size()) {
                     ui.showFramed(space + "That task number doesn't exist, tarnished.\n", horizontalLine);
                     continue;
                 }
 
-                Task removed = tasks[index];
+                Task removed = tasks.remove(index);
 
-                // Shift everything after index down by one
-                for (int i = index; i < taskCount - 1; i++) {
-                    tasks[i] = tasks[i + 1];
-                }
-                tasks[taskCount - 1] = null;
-                taskCount--;
-
-                saveTasks(tasks, taskCount);
+                saveTasks(tasks);
 
                 ui.showFramed(space + "Noted. I've removed this task:\n"
                         + space + "  " + removed + "\n"
-                        + space + "Now you have " + taskCount + " tasks in the list.\n", horizontalLine);
+                        + space + "Now you have " + tasks.size() + " tasks in the list.\n", horizontalLine);
                 continue;
             }
 
@@ -179,19 +172,18 @@ public class Margit {
                 }
 
                 // Exceed list size
-                if (taskCount >= tasks.length) {
+                if (tasks.isFull()) {
                     ui.showFramed(space + "Thy task list can hold no more.\n", horizontalLine);
                     continue;
                 }
 
-                tasks[taskCount] = new TodoTask(description);
-                taskCount++;
+                tasks.add(new TodoTask(description));
 
-                saveTasks(tasks, taskCount);
+                saveTasks(tasks);
 
                 ui.showFramed(space + "Got it. I've added this task:\n"
-                        + space + "  " + tasks[taskCount - 1] + "\n"
-                        + space + "Now you have " + taskCount + " tasks in the list.\n", horizontalLine);
+                        + space + "  " + tasks.get(tasks.size() - 1) + "\n"
+                        + space + "Now you have " + tasks.size() + " tasks in the list.\n", horizontalLine);
                 continue;
             }
 
@@ -218,21 +210,20 @@ public class Margit {
                 }
 
                 // exceed list size
-                if (taskCount >= tasks.length) {
+                if (tasks.isFull()) {
                     ui.showFramed(space + "Thy task list can hold no more.\n", horizontalLine);
                     continue;
                 }
 
                 TaskDateTime by = TaskDateTime.parse(byRaw);
 
-                tasks[taskCount] = new DeadlineTask(description, by);
-                taskCount++;
+                tasks.add(new DeadlineTask(description, by));
 
-                saveTasks(tasks, taskCount);
+                saveTasks(tasks);
 
                 ui.showFramed(space + "Got it. I've added this task:\n"
-                        + space + "  " + tasks[taskCount - 1] + "\n"
-                        + space + "Now you have " + taskCount + " tasks in the list.\n", horizontalLine);
+                        + space + "  " + tasks.get(tasks.size() - 1) + "\n"
+                        + space + "Now you have " + tasks.size() + " tasks in the list.\n", horizontalLine);
                 continue;
             }
 
@@ -262,7 +253,7 @@ public class Margit {
 
 
                 // exceed list size
-                if (taskCount >= tasks.length) {
+                if (tasks.isFull()) {
                     ui.showFramed(space + "Thy task list can hold no more.\n", horizontalLine);
                     continue;
                 }
@@ -270,14 +261,13 @@ public class Margit {
                 TaskDateTime from = TaskDateTime.parse(fromRaw);
                 TaskDateTime to = TaskDateTime.parse(toRaw);
 
-                tasks[taskCount] = new EventTask(description, from, to);
-                taskCount++;
+                tasks.add(new EventTask(description, from, to));
 
-                saveTasks(tasks, taskCount);
+                saveTasks(tasks);
 
                 ui.showFramed(space + "Got it. I've added this task:\n"
-                        + space + "  " + tasks[taskCount - 1] + "\n"
-                        + space + "Now you have " + taskCount + " tasks in the list.\n", horizontalLine);
+                        + space + "  " + tasks.get(tasks.size() - 1) + "\n"
+                        + space + "Now you have " + tasks.size() + " tasks in the list.\n", horizontalLine);
                 continue;
             }
 
@@ -522,7 +512,7 @@ public class Margit {
     /** Relative path (from project root) of the save file. */
     private static final String SAVE_FILE_PATH = "./data/Margit.txt";
 
-    private static void saveTasks(Task[] tasks, int taskCount) {
+    private static void saveTasks(TaskList tasks) {
         java.io.File saveFile = new java.io.File(SAVE_FILE_PATH);
         java.io.File parentDir = saveFile.getParentFile();
         if (parentDir != null && !parentDir.exists()) {
@@ -530,8 +520,8 @@ public class Margit {
         }
 
         try (java.io.FileWriter writer = new java.io.FileWriter(saveFile)) {
-            for (int i = 0; i < taskCount; i++) {
-                writer.write(tasks[i].toSaveFormat() + System.lineSeparator());
+            for (int i = 0; i < tasks.size(); i++) {
+                writer.write(tasks.get(i).toSaveFormat() + System.lineSeparator());
             }
         } catch (java.io.IOException e) {
             System.out.println("     Warning: could not save tasks to disk (" + e.getMessage() + ")");
@@ -539,21 +529,19 @@ public class Margit {
     }
 
     /**
-     * Reads tasks from {@link #SAVE_FILE_PATH} into {@code tasks} and returns
-     * how many were loaded. If the file doesn't exist yet (e.g. first run),
-     * simply returns 0 with an empty list. Any line that doesn't parse cleanly
-     * is skipped with a warning rather than crashing startup.
+     * Reads tasks from {@link #SAVE_FILE_PATH} into {@code tasks}. If the file
+     * doesn't exist yet (e.g. first run), the list remains empty. Any line that
+     * doesn't parse cleanly is skipped with a warning rather than crashing startup.
      */
-    private static int loadTasks(Task[] tasks) {
+    private static void loadTasks(TaskList tasks) {
         java.io.File saveFile = new java.io.File(SAVE_FILE_PATH);
         if (!saveFile.exists()) {
-            return 0;
+            return;
         }
 
-        int taskCount = 0;
         try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(saveFile))) {
             String line;
-            while ((line = reader.readLine()) != null && taskCount < tasks.length) {
+            while ((line = reader.readLine()) != null && !tasks.isFull()) {
                 if (line.trim().isEmpty()) {
                     continue;
                 }
@@ -584,8 +572,7 @@ public class Margit {
                     if (isDone) {
                         task.mark();
                     }
-                    tasks[taskCount] = task;
-                    taskCount++;
+                    tasks.add(task);
                 } catch (RuntimeException e) {
                     System.out.println("     Warning: skipping corrupted line in save file: " + line);
                 }
@@ -593,8 +580,50 @@ public class Margit {
         } catch (java.io.IOException e) {
             System.out.println("     Warning: could not load tasks from disk (" + e.getMessage() + ")");
         }
+    }
 
-        return taskCount;
+    /**
+     * Stores the application's tasks and performs basic list operations.
+     *
+     * <p>The fixed capacity matches the previous array-based implementation.</p>
+     */
+    private static class TaskList {
+        private static final int CAPACITY = 100;
+
+        private final Task[] tasks = new Task[CAPACITY];
+        private int size;
+
+        /** Returns the number of tasks currently in the list. */
+        int size() {
+            return size;
+        }
+
+        /** Returns whether no further tasks can be added to the list. */
+        boolean isFull() {
+            return size == CAPACITY;
+        }
+
+        /** Returns the task at the specified zero-based index. */
+        Task get(int index) {
+            return tasks[index];
+        }
+
+        /** Appends a task to the end of the list. */
+        void add(Task task) {
+            tasks[size] = task;
+            size++;
+        }
+
+        /** Removes and returns the task at the specified zero-based index. */
+        Task remove(int index) {
+            Task removed = tasks[index];
+            for (int i = index; i < size - 1; i++) {
+                tasks[i] = tasks[i + 1];
+            }
+            tasks[size - 1] = null;
+            size--;
+            return removed;
+        }
     }
 }
 
