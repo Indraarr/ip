@@ -166,10 +166,9 @@ public class Margit {
             // CREATING NEW LIST TASKS
             // Todo
             if (command.type == Parser.CommandType.TODO) {
-                String description = command.argument;
+                Parser.TodoArguments todo = Parser.parseTodo(command.argument);
 
-                // missing description
-                if (description.isEmpty()) {
+                if (!todo.isValid) {
                     ui.showFramed(space + "A todo needs a description, tarnished.\n", horizontalLine);
                     continue;
                 }
@@ -180,7 +179,7 @@ public class Margit {
                     continue;
                 }
 
-                tasks.add(new TodoTask(description));
+                tasks.add(new TodoTask(todo.description));
 
                 storage.save(tasks);
 
@@ -728,6 +727,18 @@ class Parser {
         }
     }
 
+    /** Parsed description from a todo command. */
+    static class TodoArguments {
+        final boolean isValid;
+        final String description;
+
+        /** Creates parsed todo arguments. */
+        TodoArguments(boolean isValid, String description) {
+            this.isValid = isValid;
+            this.description = description;
+        }
+    }
+
     /**
      * Parses an input line without validating command-specific arguments.
      *
@@ -793,6 +804,11 @@ class Parser {
         String toRaw = argument.substring(toIndex + 3).trim();
         boolean isValid = !description.isEmpty() && !fromRaw.isEmpty() && !toRaw.isEmpty();
         return new EventArguments(isValid, description, fromRaw, toRaw);
+    }
+
+    /** Parses and validates the required description of a todo command. */
+    static TodoArguments parseTodo(String argument) {
+        return new TodoArguments(!argument.isEmpty(), argument);
     }
 
     /** Extracts and trims the text following a keyword and one separating space. */
