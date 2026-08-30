@@ -12,17 +12,20 @@ public class DeadlineTask extends Task {
         this.by = by;
     }
 
+    /** Returns whether this deadline falls on {@code date}. */
     @Override
     public boolean occursOn(LocalDate date) {
         LocalDate deadlineDate = by.toLocalDate();
         return deadlineDate != null && deadlineDate.equals(date);
     }
 
+    /** Returns the save-file representation of this deadline task. */
     @Override
     public String toSaveFormat() {
         return "D | " + super.toSaveFormat().substring(4) + " | " + by.toSaveFormat();
     }
 
+    /** Returns the user-facing representation with the deadline details. */
     @Override
     public String toString() {
         return "[D]" + super.toString() + " (by: " + by + ")";

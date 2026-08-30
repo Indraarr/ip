@@ -14,6 +14,7 @@ public class EventTask extends Task {
         this.to = to;
     }
 
+    /** Returns whether this event occurs on {@code date}, including its start and end dates. */
     @Override
     public boolean occursOn(LocalDate date) {
         LocalDate fromDate = from.toLocalDate();
@@ -21,11 +22,13 @@ public class EventTask extends Task {
         return fromDate != null && toDate != null && !date.isBefore(fromDate) && !date.isAfter(toDate);
     }
 
+    /** Returns the save-file representation of this event task. */
     @Override
     public String toSaveFormat() {
         return "E | " + super.toSaveFormat().substring(4) + " | " + from.toSaveFormat() + " | " + to.toSaveFormat();
     }
 
+    /** Returns the user-facing representation with the event time range. */
     @Override
     public String toString() {
         return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
