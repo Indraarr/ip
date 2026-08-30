@@ -1,4 +1,3 @@
-import java.util.Scanner;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,14 +26,14 @@ public class Margit {
 
         System.out.println(banner + greet);
 
-        Scanner scanner = new Scanner(System.in);
+        Ui ui = new Ui();
         String line = "";
 
         Task[] tasks = new Task[100];
         int taskCount = loadTasks(tasks);
 
         while (true) {
-            line = scanner.nextLine();
+            line = ui.readCommand();
 
             // End Conversation
             if (line.equals("bye")) {
@@ -339,7 +338,7 @@ public class Margit {
 
         System.out.println(farewell);
 
-        scanner.close();
+        ui.close();
     }
 
     
@@ -637,5 +636,30 @@ public class Margit {
         }
 
         return taskCount;
+    }
+}
+
+/**
+ * Handles console input for the application.
+ *
+ * <p>Keeping input behind this class lets the application logic avoid depending
+ * directly on {@link java.util.Scanner}.</p>
+ */
+class Ui {
+    private final java.util.Scanner scanner;
+
+    /** Creates a UI that reads commands from standard input. */
+    Ui() {
+        scanner = new java.util.Scanner(System.in);
+    }
+
+    /** Reads and returns the next command entered by the user. */
+    String readCommand() {
+        return scanner.nextLine();
+    }
+
+    /** Releases the console input resource when the program ends. */
+    void close() {
+        scanner.close();
     }
 }
