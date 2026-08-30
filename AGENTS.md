@@ -41,3 +41,4 @@ For every Java production-code or test-code change in this project, follow the p
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
+For every future branch and commit, follow the project-specific `$seedu-git-standard` skill at `.codex/skills/seedu-git-standard/SKILL.md`.
