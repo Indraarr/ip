@@ -226,23 +226,9 @@ public class Margit {
 
             // Event
             if (command.type == Parser.CommandType.EVENT) {
-                String rest = command.argument;
-                int fromIndex = rest.indexOf("/from");
-                int toIndex = rest.indexOf("/to");
+                Parser.EventArguments event = Parser.parseEvent(command.argument);
 
-                // missing description
-                if (rest.isEmpty() || fromIndex == -1 || toIndex == -1 || toIndex < fromIndex) {
-                    ui.showFramed(space + "An event needs a description, a '/from' time, and a '/to' time, tarnished.\n",
-                            horizontalLine);
-                    continue;
-                }
-
-                String description = rest.substring(0, fromIndex).trim();
-                String fromRaw = rest.substring(fromIndex + 5, toIndex).trim();
-                String toRaw = rest.substring(toIndex + 3).trim();
-
-                // missing date
-                if (description.isEmpty() || fromRaw.isEmpty() || toRaw.isEmpty()) {
+                if (!event.isValid) {
                     ui.showFramed(space + "An event needs a description, a '/from' time, and a '/to' time, tarnished.\n",
                             horizontalLine);
                     continue;
@@ -255,10 +241,10 @@ public class Margit {
                     continue;
                 }
 
-                TaskDateTime from = TaskDateTime.parse(fromRaw);
-                TaskDateTime to = TaskDateTime.parse(toRaw);
+                TaskDateTime from = TaskDateTime.parse(event.fromRaw);
+                TaskDateTime to = TaskDateTime.parse(event.toRaw);
 
-                tasks.add(new EventTask(description, from, to));
+                tasks.add(new EventTask(event.description, from, to));
 
                 storage.save(tasks);
 
@@ -726,6 +712,22 @@ class Parser {
         }
     }
 
+    /** Parsed description and time text from an event command. */
+    static class EventArguments {
+        final boolean isValid;
+        final String description;
+        final String fromRaw;
+        final String toRaw;
+
+        /** Creates parsed event arguments. */
+        EventArguments(boolean isValid, String description, String fromRaw, String toRaw) {
+            this.isValid = isValid;
+            this.description = description;
+            this.fromRaw = fromRaw;
+            this.toRaw = toRaw;
+        }
+    }
+
     /**
      * Parses an input line without validating command-specific arguments.
      *
@@ -776,6 +778,21 @@ class Parser {
             return new DeadlineArguments(DeadlineStatus.MISSING_COMPONENT, description, byRaw);
         }
         return new DeadlineArguments(DeadlineStatus.VALID, description, byRaw);
+    }
+
+    /** Parses the description and required {@code /from} and {@code /to} values of an event command. */
+    static EventArguments parseEvent(String argument) {
+        int fromIndex = argument.indexOf("/from");
+        int toIndex = argument.indexOf("/to");
+        if (argument.isEmpty() || fromIndex == -1 || toIndex == -1 || toIndex < fromIndex) {
+            return new EventArguments(false, "", "", "");
+        }
+
+        String description = argument.substring(0, fromIndex).trim();
+        String fromRaw = argument.substring(fromIndex + 5, toIndex).trim();
+        String toRaw = argument.substring(toIndex + 3).trim();
+        boolean isValid = !description.isEmpty() && !fromRaw.isEmpty() && !toRaw.isEmpty();
+        return new EventArguments(isValid, description, fromRaw, toRaw);
     }
 
     /** Extracts and trims the text following a keyword and one separating space. */
