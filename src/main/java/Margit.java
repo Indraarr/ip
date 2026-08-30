@@ -8,6 +8,7 @@ public class Margit {
 
     public static void main(String[] args) {
 
+        Ui ui = new Ui();
         String horizontalLine = "------------------------------------------------------------------------------------------------";
         String space = "     ";
 
@@ -24,9 +25,7 @@ public class Margit {
         String greet = space + "Foul tarnished... what is it thou dost seek?\n\n"
                         + space + horizontalLine + "\n";
 
-        System.out.println(banner + greet);
-
-        Ui ui = new Ui();
+        ui.showWelcome(banner + greet);
         String line = "";
 
         Task[] tasks = new Task[100];
@@ -51,8 +50,7 @@ public class Margit {
                                .append(tasks[i])
                                .append("\n");
                 }
-                System.out.println(space + horizontalLine + "\n" + listOutput + "\n");
-                System.out.println(space + horizontalLine + "\n");
+                ui.showFramed(listOutput.toString(), horizontalLine);
                 continue;
             }
 
@@ -61,17 +59,14 @@ public class Margit {
                 String datePart = line.length() > 2 ? line.substring(3).trim() : "";
 
                 if (datePart.isEmpty()) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "Tell me which date thou wishest to inspect, tarnished.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "Tell me which date thou wishest to inspect, tarnished.\n",
+                            horizontalLine);
                     continue;
                 }
 
                 LocalDate targetDate = TaskDateTime.parseDateOnly(datePart);
                 if (targetDate == null) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "That date makes no sense to me, tarnished.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "That date makes no sense to me, tarnished.\n", horizontalLine);
                     continue;
                 }
 
@@ -88,8 +83,7 @@ public class Margit {
                 if (matches == 0) {
                     onOutput.append(space).append("Nothing awaits thee that day.\n");
                 }
-                System.out.println(space + horizontalLine + "\n" + onOutput + "\n");
-                System.out.println(space + horizontalLine + "\n");
+                ui.showFramed(onOutput.toString(), horizontalLine);
                 continue;
             }
 
@@ -103,17 +97,13 @@ public class Margit {
                 try {
                     index = Integer.parseInt(indexPart.trim()) - 1;
                 } catch (NumberFormatException e) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "Hmm, that doesn't look like a valid task number.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "Hmm, that doesn't look like a valid task number.\n", horizontalLine);
                     continue;
                 }
 
                 // No task number
                 if (index < 0 || index >= taskCount) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "That task number doesn't exist, tarnished.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "That task number doesn't exist, tarnished.\n", horizontalLine);
                     continue;
                 }
 
@@ -125,10 +115,8 @@ public class Margit {
                     String alreadyMessage = listAction
                             ? "This task is already marked as done, tarnished:"
                             : "This task is already marked as not done, tarnished:";
-                    System.out.println(space + horizontalLine + "\n"
-                            + space + alreadyMessage + "\n"
-                            + space + "  " + tasks[index] + "\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + alreadyMessage + "\n" + space + "  " + tasks[index] + "\n",
+                            horizontalLine);
                     continue;
                 }
 
@@ -138,10 +126,7 @@ public class Margit {
                         ? "Nice! I've marked this task as done:"
                         : "OK, I've marked this task as not done yet:";
 
-                System.out.println(space + horizontalLine + "\n"
-                        + space + message + "\n"
-                        + space + "  " + tasks[index] + "\n");
-                System.out.println(space + horizontalLine + "\n");
+                ui.showFramed(space + message + "\n" + space + "  " + tasks[index] + "\n", horizontalLine);
                 continue;
             }
 
@@ -154,17 +139,13 @@ public class Margit {
                 try {
                     index = Integer.parseInt(indexPart.trim()) - 1;
                 } catch (NumberFormatException e) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "Hmm, that doesn't look like a valid task number.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "Hmm, that doesn't look like a valid task number.\n", horizontalLine);
                     continue;
                 }
 
                 // No task number
                 if (index < 0 || index >= taskCount) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "That task number doesn't exist, tarnished.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "That task number doesn't exist, tarnished.\n", horizontalLine);
                     continue;
                 }
 
@@ -179,11 +160,9 @@ public class Margit {
 
                 saveTasks(tasks, taskCount);
 
-                System.out.println(space + horizontalLine + "\n"
-                        + space + "Noted. I've removed this task:\n"
+                ui.showFramed(space + "Noted. I've removed this task:\n"
                         + space + "  " + removed + "\n"
-                        + space + "Now you have " + taskCount + " tasks in the list.\n");
-                System.out.println(space + horizontalLine + "\n");
+                        + space + "Now you have " + taskCount + " tasks in the list.\n", horizontalLine);
                 continue;
             }
 
@@ -195,17 +174,13 @@ public class Margit {
 
                 // missing description
                 if (description.isEmpty()) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "A todo needs a description, tarnished.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "A todo needs a description, tarnished.\n", horizontalLine);
                     continue;
                 }
 
                 // Exceed list size
                 if (taskCount >= tasks.length) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "Thy task list can hold no more.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "Thy task list can hold no more.\n", horizontalLine);
                     continue;
                 }
 
@@ -214,11 +189,9 @@ public class Margit {
 
                 saveTasks(tasks, taskCount);
 
-                System.out.println(space + horizontalLine + "\n"
-                        + space + "Got it. I've added this task:\n"
-                        + space + "  " + tasks[taskCount - 1].toString() + "\n"
-                        + space + "Now you have " + taskCount + " tasks in the list.\n");
-                System.out.println(space + horizontalLine + "\n");
+                ui.showFramed(space + "Got it. I've added this task:\n"
+                        + space + "  " + tasks[taskCount - 1] + "\n"
+                        + space + "Now you have " + taskCount + " tasks in the list.\n", horizontalLine);
                 continue;
             }
 
@@ -228,9 +201,8 @@ public class Margit {
                 int byIndex = rest.indexOf("/by");
 
                 if (rest.isEmpty() || byIndex == -1) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "A deadline needs a description and a '/by' date, tarnished.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "A deadline needs a description and a '/by' date, tarnished.\n",
+                            horizontalLine);
                     continue;
                 }
 
@@ -240,17 +212,14 @@ public class Margit {
 
                 // missing description
                 if (description.isEmpty() || byRaw.isEmpty()) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "A deadline needs both a description and a '/by' date, tarnished.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "A deadline needs both a description and a '/by' date, tarnished.\n",
+                            horizontalLine);
                     continue;
                 }
 
                 // exceed list size
                 if (taskCount >= tasks.length) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "Thy task list can hold no more.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "Thy task list can hold no more.\n", horizontalLine);
                     continue;
                 }
 
@@ -261,11 +230,9 @@ public class Margit {
 
                 saveTasks(tasks, taskCount);
 
-                System.out.println(space + horizontalLine + "\n"
-                        + space + "Got it. I've added this task:\n"
-                        + space + "  " + tasks[taskCount - 1].toString() + "\n"
-                        + space + "Now you have " + taskCount + " tasks in the list.\n");
-                System.out.println(space + horizontalLine + "\n");
+                ui.showFramed(space + "Got it. I've added this task:\n"
+                        + space + "  " + tasks[taskCount - 1] + "\n"
+                        + space + "Now you have " + taskCount + " tasks in the list.\n", horizontalLine);
                 continue;
             }
 
@@ -277,9 +244,8 @@ public class Margit {
 
                 // missing description
                 if (rest.isEmpty() || fromIndex == -1 || toIndex == -1 || toIndex < fromIndex) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "An event needs a description, a '/from' time, and a '/to' time, tarnished.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "An event needs a description, a '/from' time, and a '/to' time, tarnished.\n",
+                            horizontalLine);
                     continue;
                 }
 
@@ -289,18 +255,15 @@ public class Margit {
 
                 // missing date
                 if (description.isEmpty() || fromRaw.isEmpty() || toRaw.isEmpty()) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "An event needs a description, a '/from' time, and a '/to' time, tarnished.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "An event needs a description, a '/from' time, and a '/to' time, tarnished.\n",
+                            horizontalLine);
                     continue;
                 }
 
 
                 // exceed list size
                 if (taskCount >= tasks.length) {
-                    System.out.println(space + horizontalLine + "\n" + space
-                            + "Thy task list can hold no more.\n");
-                    System.out.println(space + horizontalLine + "\n");
+                    ui.showFramed(space + "Thy task list can hold no more.\n", horizontalLine);
                     continue;
                 }
 
@@ -312,20 +275,16 @@ public class Margit {
 
                 saveTasks(tasks, taskCount);
 
-                System.out.println(space + horizontalLine + "\n"
-                        + space + "Got it. I've added this task:\n"
-                        + space + "  " + tasks[taskCount - 1].toString() + "\n"
-                        + space + "Now you have " + taskCount + " tasks in the list.\n");
-                System.out.println(space + horizontalLine + "\n");
+                ui.showFramed(space + "Got it. I've added this task:\n"
+                        + space + "  " + tasks[taskCount - 1] + "\n"
+                        + space + "Now you have " + taskCount + " tasks in the list.\n", horizontalLine);
                 continue;
             }
 
 
             // No task type specified
 
-            System.out.println(space + horizontalLine + "\n" + space
-                    + "No idea what you mean\n");
-            System.out.println(space + horizontalLine + "\n");
+            ui.showFramed(space + "No idea what you mean\n", horizontalLine);
 
 
         }
@@ -336,7 +295,7 @@ public class Margit {
                         + space + "Tis well... put these foolish ambitions to rest.\n\n"
                         + space + horizontalLine + "\n";
 
-        System.out.println(farewell);
+        ui.showFarewell(farewell);
 
         ui.close();
     }
@@ -640,7 +599,7 @@ public class Margit {
 }
 
 /**
- * Handles console input for the application.
+ * Handles console input and output for the application.
  *
  * <p>Keeping input behind this class lets the application logic avoid depending
  * directly on {@link java.util.Scanner}.</p>
@@ -658,8 +617,26 @@ class Ui {
         return scanner.nextLine();
     }
 
+    /** Displays the application's welcome banner and greeting. */
+    void showWelcome(String welcomeMessage) {
+        System.out.println(welcomeMessage);
+    }
+
+    /** Displays a message between two horizontal separator lines. */
+    void showFramed(String message, String horizontalLine) {
+        System.out.println(INDENT + horizontalLine + "\n" + message + "\n");
+        System.out.println(INDENT + horizontalLine + "\n");
+    }
+
+    /** Displays the application's farewell message. */
+    void showFarewell(String farewellMessage) {
+        System.out.println(farewellMessage);
+    }
+
     /** Releases the console input resource when the program ends. */
     void close() {
         scanner.close();
     }
+
+    private static final String INDENT = "     ";
 }
