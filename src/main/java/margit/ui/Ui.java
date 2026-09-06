@@ -52,104 +52,204 @@ public class Ui {
 
     /** Displays all tasks currently in the task list. */
     public void showTaskList(TaskList tasks) {
-        showTasks("Here are the tasks in your list:", tasks, "");
+        showFramed(formatTaskList(tasks));
+    }
+
+    /** Returns the message body for the current task list. */
+    public String formatTaskList(TaskList tasks) {
+        return formatTasks("Here are the tasks in your list:", tasks, "");
     }
 
     /** Displays all tasks whose descriptions match a find command. */
     public void showFindResults(TaskList matchingTasks) {
-        showTasks("Here are the matching tasks in your list:", matchingTasks, "No matching tasks found.");
+        showFramed(formatFindResults(matchingTasks));
+    }
+
+    /** Returns the message body for matching tasks. */
+    public String formatFindResults(TaskList matchingTasks) {
+        return formatTasks("Here are the matching tasks in your list:", matchingTasks, "No matching tasks found.");
     }
 
     /** Displays tasks that occur on the specified date. */
     public void showTasksOnDate(LocalDate date, TaskList matchingTasks) {
+        showFramed(formatTasksOnDate(date, matchingTasks));
+    }
+
+    /** Returns the message body for tasks that occur on a date. */
+    public String formatTasksOnDate(LocalDate date, TaskList matchingTasks) {
         String heading = "Here is what falls upon " + date.format(TaskDateTime.OUTPUT_DATE) + ":";
-        showTasks(heading, matchingTasks, "Nothing awaits thee that day.");
+        return formatTasks(heading, matchingTasks, "Nothing awaits thee that day.");
     }
 
     /** Displays an error when a find command has no keyword. */
     public void showMissingFindKeyword() {
-        showFramed("A find command needs a keyword, tarnished.");
+        showFramed(formatMissingFindKeyword());
+    }
+
+    /** Returns the error message for a find command without a keyword. */
+    public String formatMissingFindKeyword() {
+        return "A find command needs a keyword, tarnished.";
     }
 
     /** Displays an error when an on command has no date. */
     public void showMissingDate() {
-        showFramed("Tell me which date thou wishest to inspect, tarnished.");
+        showFramed(formatMissingDate());
+    }
+
+    /** Returns the error message for an on command without a date. */
+    public String formatMissingDate() {
+        return "Tell me which date thou wishest to inspect, tarnished.";
     }
 
     /** Displays an error when an on command contains an invalid date. */
     public void showInvalidDate() {
-        showFramed("That date makes no sense to me, tarnished.");
+        showFramed(formatInvalidDate());
+    }
+
+    /** Returns the error message for an invalid date. */
+    public String formatInvalidDate() {
+        return "That date makes no sense to me, tarnished.";
     }
 
     /** Displays an error when a task number is not a number. */
     public void showInvalidTaskNumber() {
-        showFramed("Hmm, that doesn't look like a valid task number.");
+        showFramed(formatInvalidTaskNumber());
+    }
+
+    /** Returns the error message for a nonnumeric task number. */
+    public String formatInvalidTaskNumber() {
+        return "Hmm, that doesn't look like a valid task number.";
     }
 
     /** Displays an error when a task number is outside the task list. */
     public void showTaskNotFound() {
-        showFramed("That task number doesn't exist, tarnished.");
+        showFramed(formatTaskNotFound());
+    }
+
+    /** Returns the error message for a task number outside the list. */
+    public String formatTaskNotFound() {
+        return "That task number doesn't exist, tarnished.";
     }
 
     /** Displays an unchanged completion status for a task. */
     public void showUnchangedTaskStatus(Task task, boolean isMarked) {
+        showFramed(formatUnchangedTaskStatus(task, isMarked));
+    }
+
+    /** Returns the unchanged completion-status message for a task. */
+    public String formatUnchangedTaskStatus(Task task, boolean isMarked) {
         String message = isMarked ? "This task is already marked as done, tarnished:"
                 : "This task is already marked as not done, tarnished:";
-        showFramed(message + "\n  " + task);
+        return message + "\n  " + task;
     }
 
     /** Displays a changed completion status for a task. */
     public void showChangedTaskStatus(Task task, boolean isMarked) {
+        showFramed(formatChangedTaskStatus(task, isMarked));
+    }
+
+    /** Returns the changed completion-status message for a task. */
+    public String formatChangedTaskStatus(Task task, boolean isMarked) {
         String message = isMarked ? "Nice! I've marked this task as done:"
                 : "OK, I've marked this task as not done yet:";
-        showFramed(message + "\n  " + task);
+        return message + "\n  " + task;
     }
 
     /** Displays a confirmation that a task was deleted. */
     public void showTaskDeleted(Task task, int taskCount) {
-        showFramed("Noted. I've removed this task:\n  " + task
-                + "\nNow you have " + taskCount + " tasks in the list.");
+        showFramed(formatTaskDeleted(task, taskCount));
+    }
+
+    /** Returns the deletion confirmation message for a task. */
+    public String formatTaskDeleted(Task task, int taskCount) {
+        return "Noted. I've removed this task:\n  " + task
+                + "\nNow you have " + taskCount + " tasks in the list.";
     }
 
     /** Displays an error when a todo has no description. */
     public void showMissingTodoDescription() {
-        showFramed("A todo needs a description, tarnished.");
+        showFramed(formatMissingTodoDescription());
+    }
+
+    /** Returns the error message for a todo without a description. */
+    public String formatMissingTodoDescription() {
+        return "A todo needs a description, tarnished.";
     }
 
     /** Displays an error when no more tasks can be added. */
     public void showTaskListFull() {
-        showFramed("Thy task list can hold no more.");
+        showFramed(formatTaskListFull());
+    }
+
+    /** Returns the error message for a full task list. */
+    public String formatTaskListFull() {
+        return "Thy task list can hold no more.";
     }
 
     /** Displays an error when a deadline omits its /by separator. */
     public void showMissingDeadlineSeparator() {
-        showFramed("A deadline needs a description and a '/by' date, tarnished.");
+        showFramed(formatMissingDeadlineSeparator());
+    }
+
+    /** Returns the error message for a deadline without a /by separator. */
+    public String formatMissingDeadlineSeparator() {
+        return "A deadline needs a description and a '/by' date, tarnished.";
     }
 
     /** Displays an error when a deadline omits its description or /by date. */
     public void showMissingDeadlineComponent() {
-        showFramed("A deadline needs both a description and a '/by' date, tarnished.");
+        showFramed(formatMissingDeadlineComponent());
+    }
+
+    /** Returns the error message for a deadline missing a required component. */
+    public String formatMissingDeadlineComponent() {
+        return "A deadline needs both a description and a '/by' date, tarnished.";
     }
 
     /** Displays an error when an event omits required information. */
     public void showInvalidEvent() {
-        showFramed("An event needs a description, a '/from' time, and a '/to' time, tarnished.");
+        showFramed(formatInvalidEvent());
+    }
+
+    /** Returns the error message for an invalid event. */
+    public String formatInvalidEvent() {
+        return "An event needs a description, a '/from' time, and a '/to' time, tarnished.";
     }
 
     /** Displays a confirmation that a task was added. */
     public void showTaskAdded(Task task, int taskCount) {
-        showFramed("Got it. I've added this task:\n  " + task
-                + "\nNow you have " + taskCount + " tasks in the list.");
+        showFramed(formatTaskAdded(task, taskCount));
+    }
+
+    /** Returns the addition confirmation message for a task. */
+    public String formatTaskAdded(Task task, int taskCount) {
+        return "Got it. I've added this task:\n  " + task
+                + "\nNow you have " + taskCount + " tasks in the list.";
     }
 
     /** Displays an error for an unrecognized command. */
     public void showUnknownCommand() {
-        showFramed("No idea what you mean");
+        showFramed(formatUnknownCommand());
+    }
+
+    /** Returns the error message for an unrecognized command. */
+    public String formatUnknownCommand() {
+        return "No idea what you mean";
     }
 
     /** Displays the application's farewell message. */
     public void showFarewell() {
-        showFramed(FAREWELL);
+        showFramed(formatFarewell());
+    }
+
+    /** Returns the farewell message. */
+    public String formatFarewell() {
+        return FAREWELL;
+    }
+
+    /** Displays a response message between two horizontal separator lines. */
+    public void showResponse(String response) {
+        showFramed(response);
     }
 
     /** Releases the console input resource when the program ends. */
@@ -165,7 +265,7 @@ public class Ui {
     }
 
     /** Displays a heading followed by numbered tasks or an empty-list message. */
-    private void showTasks(String heading, TaskList tasks, String emptyMessage) {
+    private String formatTasks(String heading, TaskList tasks, String emptyMessage) {
         StringBuilder message = new StringBuilder(heading);
         for (int i = 0; i < tasks.size(); i++) {
             message.append("\n").append(i + 1).append(".").append(tasks.get(i));
@@ -173,6 +273,6 @@ public class Ui {
         if (tasks.size() == 0 && !emptyMessage.isEmpty()) {
             message.append("\n").append(emptyMessage);
         }
-        showFramed(message.toString());
+        return message.toString();
     }
 }
