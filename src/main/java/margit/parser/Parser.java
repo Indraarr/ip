@@ -25,6 +25,17 @@ public class Parser {
         }
     }
 
+    /** Parsed description from a todo command. */
+    public static class TodoArguments {
+        public final boolean isValid;
+        public final String description;
+
+        private TodoArguments(boolean isValid, String description) {
+            this.isValid = isValid;
+            this.description = description;
+        }
+    }
+
     /** Validation outcomes for a deadline command's required components. */
     public enum DeadlineStatus {
         VALID, MISSING_SEPARATOR, MISSING_COMPONENT
@@ -55,17 +66,6 @@ public class Parser {
             this.description = description;
             this.fromRaw = fromRaw;
             this.toRaw = toRaw;
-        }
-    }
-
-    /** Parsed description from a todo command. */
-    public static class TodoArguments {
-        public final boolean isValid;
-        public final String description;
-
-        private TodoArguments(boolean isValid, String description) {
-            this.isValid = isValid;
-            this.description = description;
         }
     }
 
@@ -104,6 +104,11 @@ public class Parser {
         return new Command(CommandType.UNKNOWN, "");
     }
 
+    /** Parses and validates the required description of a todo command. */
+    public static TodoArguments parseTodo(String argument) {
+        return new TodoArguments(!argument.isEmpty(), argument);
+    }
+
     /** Parses the description and required {@code /by} value of a deadline command. */
     public static DeadlineArguments parseDeadline(String argument) {
         int byIndex = argument.indexOf("/by");
@@ -130,11 +135,6 @@ public class Parser {
         String toRaw = argument.substring(toIndex + 3).trim();
         boolean isValid = !description.isEmpty() && !fromRaw.isEmpty() && !toRaw.isEmpty();
         return new EventArguments(isValid, description, fromRaw, toRaw);
-    }
-
-    /** Parses and validates the required description of a todo command. */
-    public static TodoArguments parseTodo(String argument) {
-        return new TodoArguments(!argument.isEmpty(), argument);
     }
 
     /** Extracts and trims the text following a keyword and one separating space. */

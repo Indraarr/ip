@@ -35,29 +35,7 @@ public class Margit {
 
     /** Runs the interactive command loop until the user enters {@code bye}. */
     public void run() {
-        String horizontalLine = "-".repeat(96);
-        String space = "     ";
-
-        String banner = "___  ___                _ _         _____ _           "
-                + "______   _ _   _____                      \n"
-                + "|  \\/  |               (_) |       |_   _| |          "
-                + "|  ___| | | | |  _  |                     \n"
-                + "| .  . | __ _ _ __ __ _ _| |_        | | | |__   ___  "
-                + "| |_ ___| | | | | | |_ __ ___   ___ _ __  \n"
-                + "| |\\/| |/ _` | '__/ _` | | __|       | | | '_ \\ / _ \\ "
-                + "|  _/ _ \\ | | | | | | | '_ ` _ \\ / _ \\ '_ \\ \n"
-                + "| |  | | (_| | | | (_| | | |_   _    | | | | | | |  __/ "
-                + "| ||  __/ | | \\ \\_/ / | | | | | | |  __/ | | |\n"
-                + "\\_|  |_/\\__,_|_|  \\__, |_|\\__| ( )   \\_/ |_| |_|\\___| "
-                + "\\_| \\___|_|_|  \\___/|_| |_| |_| |_|\\___|_| |_|\n"
-                + "                   __/ |       |/                                                               \n"
-                + "                  |___/                                                                         \n"
-                + horizontalLine + "\n";
-
-        String greet = space + "Foul tarnished... what is it thou dost seek?\n\n"
-                        + space + horizontalLine + "\n";
-
-        ui.showWelcome(banner + greet);
+        ui.showWelcome();
         while (true) {
             Parser.Command command = Parser.parse(ui.readCommand());
 
@@ -66,185 +44,144 @@ public class Margit {
             }
 
             if (command.type == Parser.CommandType.LIST) {
-                StringBuilder listOutput = new StringBuilder();
-                listOutput.append(space).append("Here are the tasks in your list:\n");
-                for (int i = 0; i < tasks.size(); i++) {
-                    listOutput.append(space).append(i + 1).append(".").append(tasks.get(i)).append("\n");
-                }
-                ui.showFramed(listOutput.toString(), horizontalLine);
+                ui.showTaskList(tasks);
                 continue;
             }
 
             if (command.type == Parser.CommandType.FIND) {
                 if (command.argument.isEmpty()) {
-                    ui.showFramed(space + "A find command needs a keyword, tarnished.\n", horizontalLine);
+                    ui.showMissingFindKeyword();
                     continue;
                 }
 
-                TaskList matchingTasks = tasks.findByKeyword(command.argument);
-                StringBuilder findOutput = new StringBuilder();
-                findOutput.append(space).append("Here are the matching tasks in your list:\n");
-                for (int i = 0; i < matchingTasks.size(); i++) {
-                    findOutput.append(space).append(i + 1).append(".").append(matchingTasks.get(i)).append("\n");
-                }
-                if (matchingTasks.size() == 0) {
-                    findOutput.append(space).append("No matching tasks found.\n");
-                }
-                ui.showFramed(findOutput.toString(), horizontalLine);
+                ui.showFindResults(tasks.findByKeyword(command.argument));
                 continue;
             }
 
             if (command.type == Parser.CommandType.ON) {
                 String datePart = command.argument;
                 if (datePart.isEmpty()) {
-                    ui.showFramed(space + "Tell me which date thou wishest to inspect, tarnished.\n", horizontalLine);
+                    ui.showMissingDate();
                     continue;
                 }
 
                 LocalDate targetDate = TaskDateTime.parseDateOnly(datePart);
                 if (targetDate == null) {
-                    ui.showFramed(space + "That date makes no sense to me, tarnished.\n", horizontalLine);
+                    ui.showInvalidDate();
                     continue;
                 }
 
-                StringBuilder onOutput = new StringBuilder();
-                onOutput.append(space).append("Here is what falls upon ")
-                        .append(targetDate.format(TaskDateTime.OUTPUT_DATE)).append(":\n");
-                int matches = 0;
+                TaskList matchingTasks = new TaskList();
                 for (int i = 0; i < tasks.size(); i++) {
                     if (tasks.get(i).occursOn(targetDate)) {
-                        matches++;
-                        onOutput.append(space).append(matches).append(".").append(tasks.get(i)).append("\n");
+                        matchingTasks.add(tasks.get(i));
                     }
                 }
-                if (matches == 0) {
-                    onOutput.append(space).append("Nothing awaits thee that day.\n");
-                }
-                ui.showFramed(onOutput.toString(), horizontalLine);
+                ui.showTasksOnDate(targetDate, matchingTasks);
                 continue;
             }
 
             if (command.type == Parser.CommandType.MARK || command.type == Parser.CommandType.UNMARK) {
                 boolean listAction = command.type == Parser.CommandType.MARK;
                 if (command.taskIndex == null) {
-                    ui.showFramed(space + "Hmm, that doesn't look like a valid task number.\n", horizontalLine);
+                    ui.showInvalidTaskNumber();
                     continue;
                 }
                 int index = command.taskIndex;
                 if (index < 0 || index >= tasks.size()) {
-                    ui.showFramed(space + "That task number doesn't exist, tarnished.\n", horizontalLine);
+                    ui.showTaskNotFound();
                     continue;
                 }
 
                 boolean success = listAction ? tasks.get(index).mark() : tasks.get(index).unmark();
                 if (!success) {
-                    String alreadyMessage = listAction
-                            ? "This task is already marked as done, tarnished:"
-                            : "This task is already marked as not done, tarnished:";
-                    ui.showFramed(space + alreadyMessage + "\n" + space + "  " + tasks.get(index) + "\n",
-                            horizontalLine);
+                    ui.showUnchangedTaskStatus(tasks.get(index), listAction);
                     continue;
                 }
 
                 storage.save(tasks);
-                String message = listAction ? "Nice! I've marked this task as done:"
-                        : "OK, I've marked this task as not done yet:";
-                ui.showFramed(space + message + "\n" + space + "  " + tasks.get(index) + "\n", horizontalLine);
+                ui.showChangedTaskStatus(tasks.get(index), listAction);
                 continue;
             }
 
             if (command.type == Parser.CommandType.DELETE) {
                 if (command.taskIndex == null) {
-                    ui.showFramed(space + "Hmm, that doesn't look like a valid task number.\n", horizontalLine);
+                    ui.showInvalidTaskNumber();
                     continue;
                 }
                 int index = command.taskIndex;
                 if (index < 0 || index >= tasks.size()) {
-                    ui.showFramed(space + "That task number doesn't exist, tarnished.\n", horizontalLine);
+                    ui.showTaskNotFound();
                     continue;
                 }
 
                 Task removed = tasks.remove(index);
                 storage.save(tasks);
-                ui.showFramed(space + "Noted. I've removed this task:\n" + space + "  " + removed + "\n"
-                        + space + "Now you have " + tasks.size() + " tasks in the list.\n", horizontalLine);
+                ui.showTaskDeleted(removed, tasks.size());
                 continue;
             }
 
             if (command.type == Parser.CommandType.TODO) {
                 Parser.TodoArguments todo = Parser.parseTodo(command.argument);
                 if (!todo.isValid) {
-                    ui.showFramed(space + "A todo needs a description, tarnished.\n", horizontalLine);
+                    ui.showMissingTodoDescription();
                     continue;
                 }
                 if (tasks.isFull()) {
-                    ui.showFramed(space + "Thy task list can hold no more.\n", horizontalLine);
+                    ui.showTaskListFull();
                     continue;
                 }
 
                 tasks.add(new TodoTask(todo.description));
                 storage.save(tasks);
-                showTaskAdded(space, horizontalLine);
+                ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                 continue;
             }
 
             if (command.type == Parser.CommandType.DEADLINE) {
                 Parser.DeadlineArguments deadline = Parser.parseDeadline(command.argument);
                 if (deadline.status == Parser.DeadlineStatus.MISSING_SEPARATOR) {
-                    ui.showFramed(space + "A deadline needs a description and a '/by' date, tarnished.\n",
-                            horizontalLine);
+                    ui.showMissingDeadlineSeparator();
                     continue;
                 }
                 if (deadline.status == Parser.DeadlineStatus.MISSING_COMPONENT) {
-                    ui.showFramed(space + "A deadline needs both a description and a '/by' date, tarnished.\n",
-                            horizontalLine);
+                    ui.showMissingDeadlineComponent();
                     continue;
                 }
                 if (tasks.isFull()) {
-                    ui.showFramed(space + "Thy task list can hold no more.\n", horizontalLine);
+                    ui.showTaskListFull();
                     continue;
                 }
 
                 tasks.add(new DeadlineTask(deadline.description, TaskDateTime.parse(deadline.byRaw)));
                 storage.save(tasks);
-                showTaskAdded(space, horizontalLine);
+                ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                 continue;
             }
 
             if (command.type == Parser.CommandType.EVENT) {
                 Parser.EventArguments event = Parser.parseEvent(command.argument);
                 if (!event.isValid) {
-                    ui.showFramed(
-                            space + "An event needs a description, a '/from' time, and a '/to' time, tarnished.\n",
-                            horizontalLine);
+                    ui.showInvalidEvent();
                     continue;
                 }
                 if (tasks.isFull()) {
-                    ui.showFramed(space + "Thy task list can hold no more.\n", horizontalLine);
+                    ui.showTaskListFull();
                     continue;
                 }
 
                 tasks.add(new EventTask(event.description, TaskDateTime.parse(event.fromRaw),
                         TaskDateTime.parse(event.toRaw)));
                 storage.save(tasks);
-                showTaskAdded(space, horizontalLine);
+                ui.showTaskAdded(tasks.get(tasks.size() - 1), tasks.size());
                 continue;
             }
 
-            ui.showFramed(space + "No idea what you mean\n", horizontalLine);
+            ui.showUnknownCommand();
         }
 
-        String farewell = space + horizontalLine + "\n"
-                + space + "Tis well... put these foolish ambitions to rest.\n\n"
-                + space + horizontalLine + "\n";
-        ui.showFarewell(farewell);
+        ui.showFarewell();
         ui.close();
-    }
-
-    /** Displays the standard confirmation shown after adding a task. */
-    private void showTaskAdded(String space, String horizontalLine) {
-        ui.showFramed(space + "Got it. I've added this task:\n" + space + "  " + tasks.get(tasks.size() - 1)
-                + "\n" + space + "Now you have " + tasks.size() + " tasks in the list.\n", horizontalLine);
     }
 
     /** Starts the application using its default save-file location. */
