@@ -21,10 +21,16 @@ public class TaskList {
         return tasks[index];
     }
 
-    /** Appends a task to the end of the list. */
-    public void add(Task task) {
-        tasks[size] = task;
-        size++;
+    /**
+     * Appends one or more tasks to the end of the list.
+     *
+     * @param tasksToAdd tasks to append, in order
+     */
+    public void add(Task... tasksToAdd) {
+        for (Task task : tasksToAdd) {
+            tasks[size] = task;
+            size++;
+        }
     }
 
     /** Removes and returns the task at the specified zero-based index. */

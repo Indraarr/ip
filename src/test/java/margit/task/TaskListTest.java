@@ -8,13 +8,12 @@ import org.junit.jupiter.api.Test;
 /** Tests the collection operations provided by {@link TaskList}. */
 class TaskListTest {
     @Test
-    void add_tasks_appendsThemAndUpdatesSize() {
+    void add_multipleTasks_appendsThemInOrderAndUpdatesSize() {
         TaskList tasks = new TaskList();
         Task first = new TodoTask("first");
         Task second = new TodoTask("second");
 
-        tasks.add(first);
-        tasks.add(second);
+        tasks.add(first, second);
 
         assertEquals(2, tasks.size());
         assertSame(first, tasks.get(0));
