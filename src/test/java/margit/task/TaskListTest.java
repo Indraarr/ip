@@ -2,6 +2,7 @@ package margit.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +19,20 @@ class TaskListTest {
         assertEquals(2, tasks.size());
         assertSame(first, tasks.get(0));
         assertSame(second, tasks.get(1));
+    }
+
+    @Test
+    void get_emptyList_throwsAssertionError() {
+        TaskList tasks = new TaskList();
+
+        assertThrows(AssertionError.class, () -> tasks.get(0));
+    }
+
+    @Test
+    void remove_emptyList_throwsAssertionError() {
+        TaskList tasks = new TaskList();
+
+        assertThrows(AssertionError.class, () -> tasks.remove(0));
     }
 
     @Test

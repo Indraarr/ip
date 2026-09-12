@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 /** Represents a task that occurs from one date or time to another. */
 public class EventTask extends Task {
+    private static final String EVENT_TYPE = "E";
+
     private final TaskDateTime from;
     private final TaskDateTime to;
 
@@ -19,13 +21,20 @@ public class EventTask extends Task {
     public boolean occursOn(LocalDate date) {
         LocalDate fromDate = from.toLocalDate();
         LocalDate toDate = to.toLocalDate();
-        return fromDate != null && toDate != null && !date.isBefore(fromDate) && !date.isAfter(toDate);
+        if (fromDate == null || toDate == null) {
+            return false;
+        }
+
+        boolean isOnOrAfterStartDate = !date.isBefore(fromDate);
+        boolean isOnOrBeforeEndDate = !date.isAfter(toDate);
+        return isOnOrAfterStartDate && isOnOrBeforeEndDate;
     }
 
     /** Returns the save-file representation of this event task. */
     @Override
     public String toSaveFormat() {
-        return "E | " + super.toSaveFormat().substring(4) + " | " + from.toSaveFormat() + " | " + to.toSaveFormat();
+        return EVENT_TYPE + SAVE_FIELD_SEPARATOR + getSaveStatusAndDescription()
+                + SAVE_FIELD_SEPARATOR + from.toSaveFormat() + SAVE_FIELD_SEPARATOR + to.toSaveFormat();
     }
 
     /** Returns the user-facing representation with the event time range. */
