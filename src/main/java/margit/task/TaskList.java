@@ -1,5 +1,7 @@
 package margit.task;
 
+import java.util.Arrays;
+
 /** Stores the application's tasks and performs basic list operations. */
 public class TaskList {
     private static final int CAPACITY = 100;
@@ -51,11 +53,9 @@ public class TaskList {
     /** Returns the tasks whose descriptions contain {@code keyword}, in list order. */
     public TaskList findByKeyword(String keyword) {
         TaskList matchingTasks = new TaskList();
-        for (int i = 0; i < size; i++) {
-            if (tasks[i].hasKeyword(keyword)) {
-                matchingTasks.add(tasks[i]);
-            }
-        }
+        Arrays.stream(tasks, 0, size)
+                .filter(task -> task.hasKeyword(keyword))
+                .forEach(matchingTasks::add);
         return matchingTasks;
     }
 
