@@ -21,7 +21,13 @@ public class EventTask extends Task {
     public boolean occursOn(LocalDate date) {
         LocalDate fromDate = from.toLocalDate();
         LocalDate toDate = to.toLocalDate();
-        return fromDate != null && toDate != null && !date.isBefore(fromDate) && !date.isAfter(toDate);
+        if (fromDate == null || toDate == null) {
+            return false;
+        }
+
+        boolean isOnOrAfterStartDate = !date.isBefore(fromDate);
+        boolean isOnOrBeforeEndDate = !date.isAfter(toDate);
+        return isOnOrAfterStartDate && isOnOrBeforeEndDate;
     }
 
     /** Returns the save-file representation of this event task. */
