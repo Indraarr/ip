@@ -2,6 +2,7 @@ package margit.task;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -10,6 +11,7 @@ public class TaskDateTime {
     private static final String DATE_TIME_PREFIX = "DT:";
     private static final String DATE_PREFIX = "D:";
     private static final String RAW_PREFIX = "RAW:";
+    private static final LocalTime DATE_ONLY_SORT_TIME = LocalTime.of(23, 59);
 
     private static final DateTimeFormatter[] INPUT_DATETIME_FORMATS = {
         DateTimeFormatter.ofPattern("d/M/yyyy HHmm"),
@@ -101,6 +103,14 @@ public class TaskDateTime {
     /** Returns this value's date component, or {@code null} for unparseable input. */
     public LocalDate toLocalDate() {
         return dateTime == null ? null : dateTime.toLocalDate();
+    }
+
+    /** Returns the chronological value used for sorting, or {@code null} for unparseable input. */
+    public LocalDateTime toSortDateTime() {
+        if (dateTime == null) {
+            return null;
+        }
+        return hasTime ? dateTime : dateTime.toLocalDate().atTime(DATE_ONLY_SORT_TIME);
     }
 
     /** Returns this value in the user-facing date or date-time format. */

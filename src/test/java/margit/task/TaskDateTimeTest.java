@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 
@@ -21,6 +22,13 @@ class TaskDateTimeTest {
         TaskDateTime date = TaskDateTime.parse("2/12/2019");
 
         assertEquals("D:2019-12-02", date.toSaveFormat());
+    }
+
+    @Test
+    void toSortDateTime_dateOnlyValue_returnsEndOfDay() {
+        TaskDateTime date = TaskDateTime.parse("2/12/2019");
+
+        assertEquals(LocalDateTime.of(2019, 12, 2, 23, 59), date.toSortDateTime());
     }
 
     @Test

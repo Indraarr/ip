@@ -1,6 +1,7 @@
 package margit.task;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /** Represents a task with a deadline. */
 public class DeadlineTask extends Task {
@@ -19,6 +20,12 @@ public class DeadlineTask extends Task {
     public boolean occursOn(LocalDate date) {
         LocalDate deadlineDate = by.toLocalDate();
         return deadlineDate != null && deadlineDate.equals(date);
+    }
+
+    /** Returns the deadline time used to sort this task. */
+    @Override
+    public LocalDateTime getScheduledDateTime() {
+        return by.toSortDateTime();
     }
 
     /** Returns the save-file representation of this deadline task. */

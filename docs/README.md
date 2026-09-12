@@ -20,6 +20,20 @@ Example: `keyword (optional arguments)`
 expected output
 ```
 
+## Sorting tasks
+
+Use `sort` to permanently arrange tasks for easier planning. The application
+displays todos first, followed by unscheduled deadline or event tasks, then
+chronologically ordered scheduled tasks. Events are ordered by their start
+time, and a date-only deadline is treated as 23:59 on that date.
+
+```text
+sort
+```
+
+The new order is saved and is used by later `list`, `mark`, and `delete`
+commands.
+
 ## Feature ABC
 
 // Feature details
