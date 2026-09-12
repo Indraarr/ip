@@ -18,6 +18,7 @@ public class TaskList {
 
     /** Returns the task at the specified zero-based index. */
     public Task get(int index) {
+        assert isValidIndex(index) : "Task index must refer to an existing task";
         return tasks[index];
     }
 
@@ -27,7 +28,9 @@ public class TaskList {
      * @param tasksToAdd tasks to append, in order
      */
     public void add(Task... tasksToAdd) {
+        assert size + tasksToAdd.length <= CAPACITY : "Task additions must not exceed list capacity";
         for (Task task : tasksToAdd) {
+            assert task != null : "A task list cannot contain null tasks";
             tasks[size] = task;
             size++;
         }
@@ -35,6 +38,7 @@ public class TaskList {
 
     /** Removes and returns the task at the specified zero-based index. */
     public Task remove(int index) {
+        assert isValidIndex(index) : "Task index must refer to an existing task";
         Task removed = tasks[index];
         for (int i = index; i < size - 1; i++) {
             tasks[i] = tasks[i + 1];
@@ -53,5 +57,10 @@ public class TaskList {
             }
         }
         return matchingTasks;
+    }
+
+    /** Returns whether an index refers to a task currently held by the list. */
+    private boolean isValidIndex(int index) {
+        return index >= 0 && index < size;
     }
 }
