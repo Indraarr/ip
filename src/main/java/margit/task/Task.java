@@ -1,6 +1,7 @@
 package margit.task;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /** Represents a task with a description and completion status. */
 public class Task {
@@ -59,6 +60,11 @@ public class Task {
     /** Returns whether this task falls on {@code date}. */
     public boolean occursOn(LocalDate date) {
         return false;
+    }
+
+    /** Returns the time used to sort this task, or {@code null} when it is not scheduled. */
+    public LocalDateTime getScheduledDateTime() {
+        return null;
     }
 
     /** Returns the user-facing status and description of this task. */

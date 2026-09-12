@@ -79,4 +79,37 @@ class TaskListTest {
 
         assertEquals(0, matchingTasks.size());
     }
+
+    @Test
+    void sort_mixedTasks_groupsAndPermanentlyOrdersTasks() {
+        Task firstTodo = new TodoTask("first todo");
+        Task secondTodo = new TodoTask("second todo");
+        Task unscheduledDeadline = new DeadlineTask("someday", TaskDateTime.parse("someday"));
+        Task sameTimeEvent = new EventTask("event", TaskDateTime.parse("3/12/2019 1000"),
+                TaskDateTime.parse("3/12/2019 1100"));
+        Task sameTimeDeadline = new DeadlineTask("deadline", TaskDateTime.parse("3/12/2019 1000"));
+        Task dateOnlyDeadline = new DeadlineTask("date only", TaskDateTime.parse("2/12/2019"));
+        Task earlierEvent = new EventTask("earlier event", TaskDateTime.parse("2/12/2019 1800"),
+                TaskDateTime.parse("2/12/2019 1900"));
+        TaskList tasks = new TaskList();
+        tasks.add(firstTodo, secondTodo, unscheduledDeadline, sameTimeEvent, sameTimeDeadline,
+                dateOnlyDeadline, earlierEvent);
+
+        SortedTaskLists sortedTasks = tasks.sort(SortOrder.ASCENDING);
+
+        assertTaskOrder(sortedTasks.getTodoTasks(), firstTodo, secondTodo);
+        assertTaskOrder(sortedTasks.getUnscheduledTasks(), unscheduledDeadline);
+        assertTaskOrder(sortedTasks.getScheduledTasks(), earlierEvent, dateOnlyDeadline,
+                sameTimeDeadline, sameTimeEvent);
+        assertTaskOrder(tasks, firstTodo, secondTodo, unscheduledDeadline, earlierEvent,
+                dateOnlyDeadline, sameTimeDeadline, sameTimeEvent);
+    }
+
+    /** Verifies that a task list contains the expected task objects in order. */
+    private void assertTaskOrder(TaskList tasks, Task... expectedTasks) {
+        assertEquals(expectedTasks.length, tasks.size());
+        for (int i = 0; i < expectedTasks.length; i++) {
+            assertSame(expectedTasks[i], tasks.get(i));
+        }
+    }
 }

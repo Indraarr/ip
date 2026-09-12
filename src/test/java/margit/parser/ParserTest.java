@@ -13,6 +13,7 @@ class ParserTest {
     void parse_simpleCommands_correctCommandType() {
         assertEquals(Parser.CommandType.BYE, Parser.parse("bye").type);
         assertEquals(Parser.CommandType.LIST, Parser.parse("list").type);
+        assertEquals(Parser.CommandType.SORT, Parser.parse("sort").type);
         assertEquals(Parser.CommandType.UNKNOWN, Parser.parse("unknown command").type);
     }
 

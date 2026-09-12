@@ -12,6 +12,7 @@ public class Parser {
     private static final String TODO_COMMAND = "todo";
     private static final String DEADLINE_COMMAND = "deadline";
     private static final String EVENT_COMMAND = "event";
+    private static final String SORT_COMMAND = "sort";
     private static final String BY_MARKER = "/by";
     private static final String FROM_MARKER = "/from";
     private static final String TO_MARKER = "/to";
@@ -20,7 +21,7 @@ public class Parser {
 
     /** Recognized commands accepted by the application. */
     public enum CommandType {
-        BYE, LIST, FIND, ON, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, UNKNOWN
+        BYE, LIST, FIND, ON, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, SORT, UNKNOWN
     }
 
     /** Parsed result containing the command type and its remaining argument. */
@@ -116,6 +117,9 @@ public class Parser {
         }
         if (hasOptionalArgument(input, EVENT_COMMAND)) {
             return commandWithTrimmedArgument(CommandType.EVENT, input, EVENT_COMMAND);
+        }
+        if (hasOptionalArgument(input, SORT_COMMAND)) {
+            return commandWithTrimmedArgument(CommandType.SORT, input, SORT_COMMAND);
         }
         return new Command(CommandType.UNKNOWN, "");
     }

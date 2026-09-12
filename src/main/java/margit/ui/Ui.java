@@ -3,6 +3,7 @@ package margit.ui;
 import java.time.LocalDate;
 import java.util.Scanner;
 
+import margit.task.SortedTaskLists;
 import margit.task.Task;
 import margit.task.TaskDateTime;
 import margit.task.TaskList;
@@ -58,6 +59,16 @@ public class Ui {
     /** Returns the message body for the current task list. */
     public String formatTaskList(TaskList tasks) {
         return formatTasks("Here are the tasks in your list:", tasks, "");
+    }
+
+    /** Returns the grouped message body for a permanently sorted task list. */
+    public String formatSortedTaskLists(SortedTaskLists sortedTaskLists) {
+        StringBuilder message = new StringBuilder();
+        appendTaskSection(message, "To Dos:", sortedTaskLists.getTodoTasks());
+        appendTaskSection(message, "Unscheduled Tasks:", sortedTaskLists.getUnscheduledTasks());
+        appendTaskSection(message, "Scheduled Tasks:", sortedTaskLists.getScheduledTasks());
+
+        return message.isEmpty() ? "There are no tasks to sort." : message.toString();
     }
 
     /** Displays all tasks whose descriptions match a find command. */
@@ -216,6 +227,11 @@ public class Ui {
         return "An event needs a description, a '/from' time, and a '/to' time, tarnished.";
     }
 
+    /** Returns the error message for an unsupported sort command. */
+    public String formatInvalidSortCommand() {
+        return "Sort does not accept arguments. Use 'sort', tarnished.";
+    }
+
     /** Displays a confirmation that a task was added. */
     public void showTaskAdded(Task task, int taskCount) {
         showFramed(formatTaskAdded(task, taskCount));
@@ -274,5 +290,16 @@ public class Ui {
             message.append("\n").append(emptyMessage);
         }
         return message.toString();
+    }
+
+    /** Appends a numbered task section when it contains at least one task. */
+    private void appendTaskSection(StringBuilder message, String heading, TaskList tasks) {
+        if (tasks.size() == 0) {
+            return;
+        }
+        if (!message.isEmpty()) {
+            message.append("\n\n");
+        }
+        message.append(formatTasks(heading, tasks, ""));
     }
 }

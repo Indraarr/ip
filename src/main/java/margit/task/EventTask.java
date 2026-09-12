@@ -1,6 +1,7 @@
 package margit.task;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /** Represents a task that occurs from one date or time to another. */
 public class EventTask extends Task {
@@ -28,6 +29,12 @@ public class EventTask extends Task {
         boolean isOnOrAfterStartDate = !date.isBefore(fromDate);
         boolean isOnOrBeforeEndDate = !date.isAfter(toDate);
         return isOnOrAfterStartDate && isOnOrBeforeEndDate;
+    }
+
+    /** Returns the event start time used to sort this task. */
+    @Override
+    public LocalDateTime getScheduledDateTime() {
+        return from.toSortDateTime();
     }
 
     /** Returns the save-file representation of this event task. */

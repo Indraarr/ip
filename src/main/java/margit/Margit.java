@@ -6,6 +6,8 @@ import margit.parser.Parser;
 import margit.storage.Storage;
 import margit.task.DeadlineTask;
 import margit.task.EventTask;
+import margit.task.SortOrder;
+import margit.task.SortedTaskLists;
 import margit.task.Task;
 import margit.task.TaskDateTime;
 import margit.task.TaskList;
@@ -49,6 +51,9 @@ public class Margit {
         }
         if (command.type == Parser.CommandType.LIST) {
             return ui.formatTaskList(tasks);
+        }
+        if (command.type == Parser.CommandType.SORT) {
+            return processSortCommand(command.argument);
         }
         if (command.type == Parser.CommandType.FIND) {
             if (command.argument.isEmpty()) {
@@ -110,6 +115,17 @@ public class Margit {
             }
         }
         return ui.formatTasksOnDate(targetDate, matchingTasks);
+    }
+
+    /** Processes a sort command and returns the grouped, sorted task list. */
+    private String processSortCommand(String argument) {
+        if (!argument.isEmpty()) {
+            return ui.formatInvalidSortCommand();
+        }
+
+        SortedTaskLists sortedTasks = tasks.sort(SortOrder.ASCENDING);
+        storage.save(tasks);
+        return ui.formatSortedTaskLists(sortedTasks);
     }
 
     /** Processes a mark or unmark command and returns its response. */
