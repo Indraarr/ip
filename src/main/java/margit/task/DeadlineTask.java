@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 /** Represents a task with a deadline. */
 public class DeadlineTask extends Task {
+    private static final String DEADLINE_TYPE = "D";
+
     private final TaskDateTime by;
 
     /** Creates a deadline task with its description and deadline. */
@@ -22,7 +24,8 @@ public class DeadlineTask extends Task {
     /** Returns the save-file representation of this deadline task. */
     @Override
     public String toSaveFormat() {
-        return "D | " + super.toSaveFormat().substring(4) + " | " + by.toSaveFormat();
+        return DEADLINE_TYPE + SAVE_FIELD_SEPARATOR + getSaveStatusAndDescription()
+                + SAVE_FIELD_SEPARATOR + by.toSaveFormat();
     }
 
     /** Returns the user-facing representation with the deadline details. */

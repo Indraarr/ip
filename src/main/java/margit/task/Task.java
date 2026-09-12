@@ -4,6 +4,11 @@ import java.time.LocalDate;
 
 /** Represents a task with a description and completion status. */
 public class Task {
+    protected static final String SAVE_FIELD_SEPARATOR = " | ";
+    private static final String TODO_TYPE = "T";
+    private static final String DONE_MARKER = "1";
+    private static final String NOT_DONE_MARKER = "0";
+
     private final String description;
     private boolean isDone;
 
@@ -37,7 +42,13 @@ public class Task {
 
     /** Returns the representation used when this task is saved. */
     public String toSaveFormat() {
-        return "T | " + (isDone ? "1" : "0") + " | " + description;
+        return TODO_TYPE + SAVE_FIELD_SEPARATOR + getSaveStatusAndDescription();
+    }
+
+    /** Returns the save data shared by every task type, excluding its type marker. */
+    protected String getSaveStatusAndDescription() {
+        String statusMarker = isDone ? DONE_MARKER : NOT_DONE_MARKER;
+        return statusMarker + SAVE_FIELD_SEPARATOR + description;
     }
 
     /** Returns whether this task's description contains {@code keyword}. */
