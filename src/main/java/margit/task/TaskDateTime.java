@@ -7,6 +7,10 @@ import java.time.format.DateTimeParseException;
 
 /** Represents a task date or date-time while preserving unparseable user input. */
 public class TaskDateTime {
+    private static final String DATE_TIME_PREFIX = "DT:";
+    private static final String DATE_PREFIX = "D:";
+    private static final String RAW_PREFIX = "RAW:";
+
     private static final DateTimeFormatter[] INPUT_DATETIME_FORMATS = {
         DateTimeFormatter.ofPattern("d/M/yyyy HHmm"),
         DateTimeFormatter.ofPattern("d/M/yyyy H:mm"),
@@ -70,14 +74,17 @@ public class TaskDateTime {
 
     /** Recreates a task date or date-time from its save-file representation. */
     public static TaskDateTime fromSaveFormat(String saved) {
-        if (saved.startsWith("DT:")) {
-            return new TaskDateTime(LocalDateTime.parse(saved.substring(3), SAVE_DATETIME), true, null);
+        if (saved.startsWith(DATE_TIME_PREFIX)) {
+            String dateTimeText = saved.substring(DATE_TIME_PREFIX.length());
+            LocalDateTime dateTime = LocalDateTime.parse(dateTimeText, SAVE_DATETIME);
+            return new TaskDateTime(dateTime, true, null);
         }
-        if (saved.startsWith("D:")) {
-            return new TaskDateTime(LocalDate.parse(saved.substring(2), SAVE_DATE).atStartOfDay(), false, null);
+        if (saved.startsWith(DATE_PREFIX)) {
+            return new TaskDateTime(LocalDate.parse(saved.substring(DATE_PREFIX.length()), SAVE_DATE).atStartOfDay(),
+                    false, null);
         }
-        if (saved.startsWith("RAW:")) {
-            return new TaskDateTime(null, false, saved.substring(4));
+        if (saved.startsWith(RAW_PREFIX)) {
+            return new TaskDateTime(null, false, saved.substring(RAW_PREFIX.length()));
         }
         return new TaskDateTime(null, false, saved);
     }
@@ -85,9 +92,10 @@ public class TaskDateTime {
     /** Returns the representation used when saving this value. */
     public String toSaveFormat() {
         if (dateTime == null) {
-            return "RAW:" + raw;
+            return RAW_PREFIX + raw;
         }
-        return hasTime ? "DT:" + dateTime.format(SAVE_DATETIME) : "D:" + dateTime.format(SAVE_DATE);
+        return hasTime ? DATE_TIME_PREFIX + dateTime.format(SAVE_DATETIME)
+                : DATE_PREFIX + dateTime.format(SAVE_DATE);
     }
 
     /** Returns this value's date component, or {@code null} for unparseable input. */
