@@ -56,7 +56,7 @@ class ParserTest {
     }
 
     @Test
-    void parse_indexedCommand_zeroTaskNumber_preservesOutOfRangeIndex() {
+    void parse_indexedCommand_zeroTaskNumberPreservesOutOfRangeIndex() {
         Parser.Command command = Parser.parse("delete 0");
 
         assertEquals(-1, command.taskIndex);
