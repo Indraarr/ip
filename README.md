@@ -1,5 +1,7 @@
 # Margit task manager
 
+![Margit interface](Ui.png)
+
 ## Prerequisites
 
 Use Java 17, as required for CS2103/T coursework. Keep `src/main/java` as the Java source root.
