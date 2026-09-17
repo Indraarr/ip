@@ -1,6 +1,7 @@
 package margit;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -19,9 +20,15 @@ public class Main extends Application {
         MainWindow mainWindow = fxmlLoader.getController();
         mainWindow.setMargit(margit);
 
-        stage.setTitle("Margit");
-        stage.setResizable(false);
-        stage.setScene(new Scene(mainLayout));
+        Scene scene = new Scene(mainLayout);
+        scene.getStylesheets().add(Objects.requireNonNull(
+                Main.class.getResource("/view/main-window.css")).toExternalForm());
+
+        stage.setTitle("Margit - Task Keeper");
+        stage.setMinHeight(500);
+        stage.setMinWidth(440);
+        stage.setResizable(true);
+        stage.setScene(scene);
         stage.show();
     }
 

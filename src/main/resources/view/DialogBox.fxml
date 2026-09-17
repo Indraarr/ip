@@ -5,14 +5,14 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 
-<fx:root alignment="TOP_RIGHT" prefWidth="400.0" type="javafx.scene.layout.HBox"
+<fx:root alignment="TOP_RIGHT" type="javafx.scene.layout.HBox"
          xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Label fx:id="dialog" minHeight="-Infinity" wrapText="true" />
-        <ImageView fx:id="displayPicture" fitHeight="99.0" fitWidth="99.0" pickOnBounds="true"
-                   preserveRatio="true" />
+        <Label fx:id="dialog" minHeight="-Infinity" styleClass="dialog-label" wrapText="true" />
+        <ImageView fx:id="displayPicture" fitHeight="36.0" fitWidth="36.0" pickOnBounds="true"
+                   preserveRatio="true" styleClass="margit-avatar" />
     </children>
     <padding>
-        <Insets bottom="15.0" left="5.0" right="5.0" top="15.0" />
+        <Insets bottom="7.0" left="14.0" right="14.0" top="7.0" />
     </padding>
 </fx:root>

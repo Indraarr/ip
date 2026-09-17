@@ -19,7 +19,6 @@ public class MainWindow extends AnchorPane {
     private TextField userInput;
 
     private Margit margit;
-    private final Image userImage = loadImage("/images/tarnished-icon.jpeg");
     private final Image margitImage = loadImage("/images/margit-icon.jpeg");
 
     /** Binds scrolling to the bottom of the dialog container. */
@@ -40,9 +39,21 @@ public class MainWindow extends AnchorPane {
         String response = margit.getResponse(input);
 
         dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input, userImage),
-                DialogBox.getMargitDialog(response, margitImage));
+                DialogBox.getUserDialog(input),
+                DialogBox.getMargitDialog(response, margitImage, isErrorResponse(response)));
         userInput.clear();
+    }
+
+    /** Returns whether a response describes a rejected command or invalid input. */
+    private static boolean isErrorResponse(String response) {
+        return response.startsWith("No idea")
+                || response.startsWith("A ")
+                || response.startsWith("An event")
+                || response.startsWith("Hmm")
+                || response.startsWith("Sort does")
+                || response.startsWith("Tell")
+                || response.startsWith("That")
+                || response.startsWith("Thy");
     }
 
     /** Loads an image bundled in the application's resources. */
