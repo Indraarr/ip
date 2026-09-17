@@ -1,44 +1,40 @@
-# Duke User Guide
+# Margit User Guide
 
-// Update the title above to match the actual product name
+![Margit interface](Ui.png)
 
-// Product screenshot goes here
+Margit, the Fell Task Keeper, is a desktop task manager for recording,
+reviewing, and planning the burdens before thee. Commands are entered in the
+chat input at the bottom of the window. Margit saves the task list after every
+change, so it is available the next time the application opens.
 
-// Product intro goes here
+## Getting started
 
-## Adding deadlines
+Launch Margit from your IDE by running `margit.Launcher`, or build the project
+with Gradle and run the generated JAR file. Type a command and press Enter or
+select **Send**. Margit greets you when the application opens.
 
-// Describe the action and its outcome.
+## Task types
 
-// Give examples of usage
+Margit manages three kinds of task:
 
-Example: `keyword (optional arguments)`
+- **Todo**: a task without a date or time.
+- **Deadline**: a task due by a date or date-time.
+- **Event**: a task that has a start and end date or date-time.
 
-// A description of the expected outcome goes here
+Tasks are saved automatically in `data/Margit.txt` relative to the folder from
+which the application is launched.
 
-```
-expected output
-```
+## Date and time formats
 
-## Sorting tasks
-
-Use `sort` to permanently arrange tasks for easier planning. The application
-displays todos first, followed by unscheduled deadline or event tasks, then
-chronologically ordered scheduled tasks. Events are ordered by their start
-time, and a date-only deadline is treated as 23:59 on that date.
+Use either a date or a date-time when creating deadlines and events. Margit
+accepts the following common formats:
 
 ```text
-sort
+19/9/2026
+2026-09-19
+19/9/2026 1900
+2026-09-19 19:00
 ```
 
-The new order is saved and is used by later `list`, `mark`, and `delete`
-commands.
-
-## Feature ABC
-
-// Feature details
-
-
-## Feature XYZ
-
-// Feature details
+A deadline given as a date only is treated as due at 23:59 on that date when
+tasks are sorted.
