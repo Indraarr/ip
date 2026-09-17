@@ -38,3 +38,94 @@ accepts the following common formats:
 
 A deadline given as a date only is treated as due at 23:59 on that date when
 tasks are sorted.
+
+## Managing tasks
+
+### Add a todo
+
+Adds a task without a date or time.
+
+```text
+todo Review week 5 lecture notes
+```
+
+### Add a deadline
+
+Adds a task with a required `/by` date or date-time.
+
+```text
+deadline Submit weekly reflection /by 19/9/2026 2359
+```
+
+### Add an event
+
+Adds a task with required `/from` and `/to` dates or date-times.
+
+```text
+event Project planning meeting /from 18/9/2026 1900 /to 18/9/2026 2030
+```
+
+### List tasks
+
+Shows every task in its current saved order.
+
+```text
+list
+```
+
+### Mark or unmark a task
+
+Marks a numbered task as complete, or restores it as incomplete. Use the task
+number shown by `list`.
+
+```text
+mark 2
+unmark 2
+```
+
+### Delete a task
+
+Removes a numbered task permanently.
+
+```text
+delete 3
+```
+
+## Finding and planning tasks
+
+### Find by keyword
+
+Shows tasks whose descriptions contain the given keyword. Matching is
+case-sensitive.
+
+```text
+find project
+```
+
+### View a date
+
+Shows deadlines and events that fall on the given date. Events that span the
+date are included.
+
+```text
+on 19/9/2026
+```
+
+### Sort tasks
+
+Permanently sorts tasks in ascending order. Todos remain first, followed by
+undated tasks and then scheduled tasks. Scheduled tasks are ordered by event
+start time or deadline due time.
+
+```text
+sort
+```
+
+### End a terminal session
+
+Use `bye` to end Margit's terminal session. In the GUI, it displays Margit's
+farewell while leaving the application window open.
+
+```text
+bye
+```
