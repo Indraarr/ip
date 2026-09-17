@@ -42,6 +42,11 @@ public class Margit {
         storage.load(tasks);
     }
 
+    /** Returns Margit's greeting for a newly opened user interface. */
+    public String getGreeting() {
+        return ui.formatGreeting();
+    }
+
     /** Processes a command and returns the same response shown by the terminal interface. */
     public String getResponse(String input) {
         Parser.Command command = Parser.parse(input);

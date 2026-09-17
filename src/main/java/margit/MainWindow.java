@@ -30,6 +30,8 @@ public class MainWindow extends AnchorPane {
     /** Injects the application instance that generates chat responses. */
     public void setMargit(Margit margit) {
         this.margit = margit;
+        dialogContainer.getChildren().add(DialogBox.getMargitDialog(
+                margit.getGreeting(), margitImage, false));
     }
 
     /** Appends the user's input and Margit's response, then clears the input field. */

@@ -1,5 +1,6 @@
 package margit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,6 +13,13 @@ import org.junit.jupiter.api.io.TempDir;
 class MargitTest {
     @TempDir
     Path temporaryDirectory;
+
+    @Test
+    void getGreeting_newInterface_returnsMargitsGreeting() {
+        Margit margit = createMargit();
+
+        assertEquals("Foul Tarnished. State thy burden.", margit.getGreeting());
+    }
 
     @Test
     void getResponse_todoAndListCommands_returnsTaskResponses() {

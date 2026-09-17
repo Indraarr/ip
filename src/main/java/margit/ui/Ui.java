@@ -14,21 +14,6 @@ public class Ui {
 
     private static final String INDENT = "     ";
     private static final String HORIZONTAL_LINE = "-".repeat(96);
-    private static final String BANNER = "___  ___                _ _         _____ _           "
-                + "______   _ _   _____                      \n"
-                + "|  \\/  |               (_) |       |_   _| |          "
-                + "|  ___| | | | |  _  |                     \n"
-                + "| .  . | __ _ _ __ __ _ _| |_        | | | |__   ___  "
-                + "| |_ ___| | | | | | |_ __ ___   ___ _ __  \n"
-                + "| |\\/| |/ _` | '__/ _` | | __|       | | | '_ \\ / _ \\ "
-                + "|  _/ _ \\ | | | | | | | '_ ` _ \\ / _ \\ '_ \\ \n"
-                + "| |  | | (_| | | | (_| | | |_   _    | | | | | | |  __/ "
-                + "| ||  __/ | | \\ \\_/ / | | | | | | |  __/ | | |\n"
-                + "\\_|  |_/\\__,_|_|  \\__, |_|\\__| ( )   \\_/ |_| |_|\\___| "
-                + "\\_| \\___|_|_|  \\___/|_| |_| |_| |_|\\___|_| |_|\n"
-                + "                   __/ |       |/                                                               \n"
-                + "                  |___/                                                                         \n"
-                + HORIZONTAL_LINE;
 
     private static final String GREETINGS = "Foul Tarnished. State thy burden.";
 
@@ -39,11 +24,15 @@ public class Ui {
         scanner = new Scanner(System.in);
     }
 
-    /** Displays the application's welcome banner and greeting. */
+    /** Displays the application's greeting. */
     public void showWelcome() {
-        System.out.println(BANNER);
-        System.out.println(INDENT + GREETINGS + "\n");
+        System.out.println(INDENT + formatGreeting() + "\n");
         System.out.println(INDENT + HORIZONTAL_LINE + "\n");
+    }
+
+    /** Returns Margit's greeting for a newly opened interface. */
+    public String formatGreeting() {
+        return GREETINGS;
     }
 
     /** Reads and returns the next command entered by the user. */

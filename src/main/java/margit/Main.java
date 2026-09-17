@@ -6,6 +6,7 @@ import java.util.Objects;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -24,6 +25,8 @@ public class Main extends Application {
         scene.getStylesheets().add(Objects.requireNonNull(
                 Main.class.getResource("/view/main-window.css")).toExternalForm());
 
+        stage.getIcons().add(new Image(Objects.requireNonNull(
+                Main.class.getResourceAsStream("/images/margit-icon.jpeg"))));
         stage.setTitle("Margit, the Fell Task Keeper");
         stage.setMinHeight(500);
         stage.setMinWidth(440);
