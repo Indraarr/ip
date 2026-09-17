@@ -46,14 +46,15 @@ public class MainWindow extends AnchorPane {
 
     /** Returns whether a response describes a rejected command or invalid input. */
     private static boolean isErrorResponse(String response) {
-        return response.startsWith("No idea")
-                || response.startsWith("A ")
+        return response.startsWith("A ")
                 || response.startsWith("An event")
-                || response.startsWith("Hmm")
-                || response.startsWith("Sort does")
-                || response.startsWith("Tell")
+                || response.startsWith("Do not")
+                || response.startsWith("Name")
+                || response.startsWith("No such")
+                || response.startsWith("Supply")
                 || response.startsWith("That")
-                || response.startsWith("Thy");
+                || response.startsWith("Thy command")
+                || response.startsWith("Thy task");
     }
 
     /** Loads an image bundled in the application's resources. */

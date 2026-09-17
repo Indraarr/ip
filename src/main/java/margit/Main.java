@@ -24,7 +24,7 @@ public class Main extends Application {
         scene.getStylesheets().add(Objects.requireNonNull(
                 Main.class.getResource("/view/main-window.css")).toExternalForm());
 
-        stage.setTitle("Margit - Task Keeper");
+        stage.setTitle("Margit, the Fell Task Keeper");
         stage.setMinHeight(500);
         stage.setMinWidth(440);
         stage.setResizable(true);

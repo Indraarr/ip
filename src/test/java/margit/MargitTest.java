@@ -20,9 +20,9 @@ class MargitTest {
         String addResponse = margit.getResponse("todo read book");
         String listResponse = margit.getResponse("list");
 
-        assertTrue(addResponse.contains("I've added this task"));
+        assertTrue(addResponse.contains("recorded this burden"));
         assertTrue(addResponse.contains("read book"));
-        assertTrue(listResponse.contains("Here are the tasks in your list"));
+        assertTrue(listResponse.contains("Behold thy burdens"));
         assertTrue(listResponse.contains("[T][ ] read book"));
     }
 
@@ -34,10 +34,10 @@ class MargitTest {
         String markResponse = margit.getResponse("mark 1");
         String deleteResponse = margit.getResponse("delete 1");
 
-        assertTrue(markResponse.contains("marked this task as done"));
+        assertTrue(markResponse.contains("Let this burden trouble thee no longer"));
         assertTrue(markResponse.contains("[T][X] read book"));
-        assertTrue(deleteResponse.contains("I've removed this task"));
-        assertTrue(deleteResponse.contains("Now you have 0 tasks"));
+        assertTrue(deleteResponse.contains("This burden is no more"));
+        assertTrue(deleteResponse.contains("0 burdens remain"));
     }
 
     @Test
@@ -53,9 +53,9 @@ class MargitTest {
         Margit reloadedMargit = createMargit();
         String reloadedListResponse = reloadedMargit.getResponse("list");
 
-        assertTrue(sortResponse.contains("To Dos:"));
-        assertTrue(sortResponse.contains("Unscheduled Tasks:"));
-        assertTrue(sortResponse.contains("Scheduled Tasks:"));
+        assertTrue(sortResponse.contains("Unfinished Burdens:"));
+        assertTrue(sortResponse.contains("Burdens Without a Time:"));
+        assertTrue(sortResponse.contains("Burdens Yet to Come:"));
         assertTrue(sortResponse.indexOf("read book") < sortResponse.indexOf("someday"));
         assertTrue(sortResponse.indexOf("someday") < sortResponse.indexOf("meeting"));
         assertTrue(sortResponse.indexOf("meeting") < sortResponse.indexOf("report"));
@@ -74,9 +74,9 @@ class MargitTest {
 
         String sortResponse = margit.getResponse("sort");
 
-        assertTrue(sortResponse.contains("To Dos:"));
-        assertFalse(sortResponse.contains("Unscheduled Tasks:"));
-        assertFalse(sortResponse.contains("Scheduled Tasks:"));
+        assertTrue(sortResponse.contains("Unfinished Burdens:"));
+        assertFalse(sortResponse.contains("Burdens Without a Time:"));
+        assertFalse(sortResponse.contains("Burdens Yet to Come:"));
     }
 
     @Test
@@ -85,7 +85,7 @@ class MargitTest {
 
         String sortResponse = margit.getResponse("sort descending");
 
-        assertTrue(sortResponse.contains("Sort does not accept arguments"));
+        assertTrue(sortResponse.contains("Do not embellish the command"));
     }
 
     /** Creates a Margit instance with a test-only save-file location. */
