@@ -1,6 +1,6 @@
 # Margit task manager
 
-![Margit interface](Ui.png)
+![Margit interface](docs/Ui.png)
 
 ## Prerequisites
 
