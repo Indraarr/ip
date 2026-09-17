@@ -30,9 +30,9 @@ public class Ui {
                 + "                  |___/                                                                         \n"
                 + HORIZONTAL_LINE;
 
-    private static final String GREETINGS = "Foul tarnished... what is it thou dost seek?";
+    private static final String GREETINGS = "Foul Tarnished. State thy burden.";
 
-    private static final String FAREWELL = "Tis well... put these foolish ambitions to rest.";
+    private static final String FAREWELL = "'Tis well... put these foolish ambitions to rest.";
 
     /** Creates a UI that reads commands from standard input. */
     public Ui() {
@@ -58,17 +58,17 @@ public class Ui {
 
     /** Returns the message body for the current task list. */
     public String formatTaskList(TaskList tasks) {
-        return formatTasks("Here are the tasks in your list:", tasks, "");
+        return formatTasks("Behold thy burdens:", tasks, "Thy ledger is empty.");
     }
 
     /** Returns the grouped message body for a permanently sorted task list. */
     public String formatSortedTaskLists(SortedTaskLists sortedTaskLists) {
         StringBuilder message = new StringBuilder();
-        appendTaskSection(message, "To Dos:", sortedTaskLists.getTodoTasks());
-        appendTaskSection(message, "Unscheduled Tasks:", sortedTaskLists.getUnscheduledTasks());
-        appendTaskSection(message, "Scheduled Tasks:", sortedTaskLists.getScheduledTasks());
+        appendTaskSection(message, "Unfinished Burdens:", sortedTaskLists.getTodoTasks());
+        appendTaskSection(message, "Burdens Without a Time:", sortedTaskLists.getUnscheduledTasks());
+        appendTaskSection(message, "Burdens Yet to Come:", sortedTaskLists.getScheduledTasks());
 
-        return message.isEmpty() ? "There are no tasks to sort." : message.toString();
+        return message.isEmpty() ? "There are no burdens to order." : message.toString();
     }
 
     /** Displays all tasks whose descriptions match a find command. */
@@ -78,7 +78,8 @@ public class Ui {
 
     /** Returns the message body for matching tasks. */
     public String formatFindResults(TaskList matchingTasks) {
-        return formatTasks("Here are the matching tasks in your list:", matchingTasks, "No matching tasks found.");
+        return formatTasks("These burdens answer thy search:", matchingTasks,
+                "No burden answers that word.");
     }
 
     /** Displays tasks that occur on the specified date. */
@@ -88,7 +89,8 @@ public class Ui {
 
     /** Returns the message body for tasks that occur on a date. */
     public String formatTasksOnDate(LocalDate date, TaskList matchingTasks) {
-        String heading = "Here is what falls upon " + date.format(TaskDateTime.OUTPUT_DATE) + ":";
+        String heading = "On " + date.format(TaskDateTime.OUTPUT_DATE)
+                + ", these burdens await thee:";
         return formatTasks(heading, matchingTasks, "Nothing awaits thee that day.");
     }
 
@@ -99,7 +101,7 @@ public class Ui {
 
     /** Returns the error message for a find command without a keyword. */
     public String formatMissingFindKeyword() {
-        return "A find command needs a keyword, tarnished.";
+        return "Name the word thou wouldst seek, Tarnished.";
     }
 
     /** Displays an error when an on command has no date. */
@@ -109,7 +111,7 @@ public class Ui {
 
     /** Returns the error message for an on command without a date. */
     public String formatMissingDate() {
-        return "Tell me which date thou wishest to inspect, tarnished.";
+        return "Name the day thou wouldst inspect, Tarnished.";
     }
 
     /** Displays an error when an on command contains an invalid date. */
@@ -119,7 +121,7 @@ public class Ui {
 
     /** Returns the error message for an invalid date. */
     public String formatInvalidDate() {
-        return "That date makes no sense to me, tarnished.";
+        return "That date is beyond my reckoning, Tarnished.";
     }
 
     /** Displays an error when a task number is not a number. */
@@ -129,7 +131,7 @@ public class Ui {
 
     /** Returns the error message for a nonnumeric task number. */
     public String formatInvalidTaskNumber() {
-        return "Hmm, that doesn't look like a valid task number.";
+        return "That is no task number.";
     }
 
     /** Displays an error when a task number is outside the task list. */
@@ -139,7 +141,7 @@ public class Ui {
 
     /** Returns the error message for a task number outside the list. */
     public String formatTaskNotFound() {
-        return "That task number doesn't exist, tarnished.";
+        return "No such burden rests upon thy ledger, Tarnished.";
     }
 
     /** Displays an unchanged completion status for a task. */
@@ -149,8 +151,8 @@ public class Ui {
 
     /** Returns the unchanged completion-status message for a task. */
     public String formatUnchangedTaskStatus(Task task, boolean isMarked) {
-        String message = isMarked ? "This task is already marked as done, tarnished:"
-                : "This task is already marked as not done, tarnished:";
+        String message = isMarked ? "This burden is already laid to rest:"
+                : "This burden already remains before thee:";
         return message + "\n  " + task;
     }
 
@@ -161,8 +163,8 @@ public class Ui {
 
     /** Returns the changed completion-status message for a task. */
     public String formatChangedTaskStatus(Task task, boolean isMarked) {
-        String message = isMarked ? "Nice! I've marked this task as done:"
-                : "OK, I've marked this task as not done yet:";
+        String message = isMarked ? "Marked. Let this burden trouble thee no longer:"
+                : "Restored. This burden remains before thee:";
         return message + "\n  " + task;
     }
 
@@ -173,8 +175,8 @@ public class Ui {
 
     /** Returns the deletion confirmation message for a task. */
     public String formatTaskDeleted(Task task, int taskCount) {
-        return "Noted. I've removed this task:\n  " + task
-                + "\nNow you have " + taskCount + " tasks in the list.";
+        return "Cast aside. This burden is no more:\n  " + task
+                + "\n" + taskCount + " burdens remain upon thy ledger.";
     }
 
     /** Displays an error when a todo has no description. */
@@ -184,7 +186,7 @@ public class Ui {
 
     /** Returns the error message for a todo without a description. */
     public String formatMissingTodoDescription() {
-        return "A todo needs a description, tarnished.";
+        return "Name the burden thou wouldst record, Tarnished.";
     }
 
     /** Displays an error when no more tasks can be added. */
@@ -204,7 +206,7 @@ public class Ui {
 
     /** Returns the error message for a deadline without a /by separator. */
     public String formatMissingDeadlineSeparator() {
-        return "A deadline needs a description and a '/by' date, tarnished.";
+        return "A deadline requires a burden and a '/by' date, Tarnished.";
     }
 
     /** Displays an error when a deadline omits its description or /by date. */
@@ -214,7 +216,7 @@ public class Ui {
 
     /** Returns the error message for a deadline missing a required component. */
     public String formatMissingDeadlineComponent() {
-        return "A deadline needs both a description and a '/by' date, tarnished.";
+        return "Supply both the burden and its '/by' date.";
     }
 
     /** Displays an error when an event omits required information. */
@@ -224,12 +226,12 @@ public class Ui {
 
     /** Returns the error message for an invalid event. */
     public String formatInvalidEvent() {
-        return "An event needs a description, a '/from' time, and a '/to' time, tarnished.";
+        return "An event requires a burden, a '/from' time, and a '/to' time.";
     }
 
     /** Returns the error message for an unsupported sort command. */
     public String formatInvalidSortCommand() {
-        return "Sort does not accept arguments. Use 'sort', tarnished.";
+        return "Do not embellish the command. Use 'sort' alone.";
     }
 
     /** Displays a confirmation that a task was added. */
@@ -239,8 +241,8 @@ public class Ui {
 
     /** Returns the addition confirmation message for a task. */
     public String formatTaskAdded(Task task, int taskCount) {
-        return "Got it. I've added this task:\n  " + task
-                + "\nNow you have " + taskCount + " tasks in the list.";
+        return "So be it. I have recorded this burden:\n  " + task
+                + "\n" + taskCount + " burdens remain upon thy ledger.";
     }
 
     /** Displays an error for an unrecognized command. */
@@ -250,7 +252,7 @@ public class Ui {
 
     /** Returns the error message for an unrecognized command. */
     public String formatUnknownCommand() {
-        return "No idea what you mean";
+        return "Thy command is unknown to me, Tarnished.";
     }
 
     /** Displays the application's farewell message. */

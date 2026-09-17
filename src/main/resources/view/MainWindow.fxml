@@ -13,7 +13,7 @@
     <children>
         <Label styleClass="app-title" text="MARGIT" AnchorPane.leftAnchor="20.0"
                AnchorPane.topAnchor="16.0" />
-        <Label styleClass="app-subtitle" text="Task keeper" AnchorPane.rightAnchor="20.0"
+        <Label styleClass="app-subtitle" text="Fell task keeper" AnchorPane.rightAnchor="20.0"
                AnchorPane.topAnchor="20.0" />
         <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="conversation-scroll"
                     vvalue="1.0" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="0.0"
