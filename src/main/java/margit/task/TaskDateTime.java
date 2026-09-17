@@ -8,6 +8,9 @@ import java.time.format.DateTimeParseException;
 
 /** Represents a task date or date-time while preserving unparseable user input. */
 public class TaskDateTime {
+    /** Format used when displaying a date to the user. */
+    public static final DateTimeFormatter OUTPUT_DATE = DateTimeFormatter.ofPattern("MMM d yyyy");
+
     private static final String DATE_TIME_PREFIX = "DT:";
     private static final String DATE_PREFIX = "D:";
     private static final String RAW_PREFIX = "RAW:";
@@ -24,8 +27,6 @@ public class TaskDateTime {
         DateTimeFormatter.ofPattern("d/M/yyyy"),
         DateTimeFormatter.ofPattern("yyyy-MM-dd"),
     };
-    /** Format used when displaying a date to the user. */
-    public static final DateTimeFormatter OUTPUT_DATE = DateTimeFormatter.ofPattern("MMM d yyyy");
     private static final DateTimeFormatter OUTPUT_DATETIME = DateTimeFormatter.ofPattern("MMM d yyyy, h:mma");
     private static final DateTimeFormatter SAVE_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter SAVE_DATETIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");

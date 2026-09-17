@@ -10,14 +10,14 @@ import margit.task.TaskList;
 
 /** Handles console input and output for the application. */
 public class Ui {
-    private final Scanner scanner;
-
     private static final String INDENT = "     ";
     private static final String HORIZONTAL_LINE = "-".repeat(96);
 
     private static final String GREETINGS = "Foul Tarnished. State thy burden.";
 
     private static final String FAREWELL = "'Tis well... put these foolish ambitions to rest.";
+
+    private final Scanner scanner;
 
     /** Creates a UI that reads commands from standard input. */
     public Ui() {
