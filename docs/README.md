@@ -9,9 +9,39 @@ change, so it is available the next time the application opens.
 
 ## Getting started
 
-Launch Margit from your IDE by running `margit.Launcher`, or build the project
-with Gradle and run the generated JAR file. Type a command and press Enter or
-select **Send**. Margit greets you when the application opens.
+Install Java 25, then launch Margit from your IDE by running `margit.Launcher`,
+or build the project with Gradle and run the generated JAR file. Type a command
+and press Enter or select **Send**. Margit greets you when the application
+opens.
+
+## Command summary
+
+| Command | Format | Purpose |
+| --- | --- | --- |
+| Add todo | `todo DESCRIPTION` | Adds an undated task. |
+| Add deadline | `deadline DESCRIPTION /by DATE_OR_TIME` | Adds a task due by a date or date-time. |
+| Add event | `event DESCRIPTION /from DATE_OR_TIME /to DATE_OR_TIME` | Adds an event with a start and end. |
+| List tasks | `list` | Shows all saved tasks. |
+| Mark task | `mark INDEX` | Marks a listed task as complete. |
+| Unmark task | `unmark INDEX` | Restores a listed task as incomplete. |
+| Delete task | `delete INDEX` | Permanently removes a listed task. |
+| Find tasks | `find KEYWORD` | Finds task descriptions containing a keyword. |
+| View a date | `on DATE` | Shows scheduled tasks that occur on a date. |
+| Sort tasks | `sort` | Permanently sorts tasks into chronological order. |
+| Exit | `bye` | Ends the terminal session or shows a GUI farewell. |
+
+`INDEX` is the task number shown by `list`. Commands and dates are described in
+more detail below.
+
+## Command conventions
+
+- Text in `UPPERCASE` is a value that you supply; do not type the capitalised
+  placeholder itself.
+- Task descriptions may contain spaces.
+- Use a task number from the most recent `list` output for commands that take
+  an `INDEX`.
+- Margit ignores leading and trailing spaces in a command, but command words
+  such as `todo` and `list` must be lowercase.
 
 ## Task types
 
@@ -114,8 +144,9 @@ on 19/9/2026
 ### Sort tasks
 
 Permanently sorts tasks in ascending order. Todos remain first, followed by
-undated tasks and then scheduled tasks. Scheduled tasks are ordered by event
-start time or deadline due time.
+deadline and event tasks in chronological order. Events are ordered by their
+start time and deadlines by their due time. If two scheduled tasks have the
+same time, deadlines appear before events.
 
 ```text
 sort

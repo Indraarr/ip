@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-Use Java 17, as required for CS2103/T coursework. Keep `src/main/java` as the Java source root.
+Use Java 25. Keep `src/main/java` as the Java source root.
 
 ## Build a fat JAR
 
